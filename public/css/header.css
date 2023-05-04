@@ -1,0 +1,133 @@
+.main-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f8f9fa;
+  height: 60px;
+  padding: 0 20px;
+}
+
+.nav-brand {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.nav-toggle {
+  display: none;
+}
+
+.nav-list {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-item {
+  margin-right: 10px;
+}
+
+.nav-link {
+  color: #343a40;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s ease-in-out;
+  padding: 0.5rem;
+}
+
+.nav-link:hover {
+  color: #212529;
+  background-color: #e9ecef;
+}
+
+.nav-dropdown-toggle {
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding-right: 1rem;
+}
+
+.nav-dropdown-toggle::after {
+  display: inline-block;
+  content: '';
+  border-top: 0.3rem solid;
+  border-right: 0.3rem solid transparent;
+  border-bottom: 0;
+  border-left: 0.3rem solid transparent;
+  margin-left: 0.25rem;
+  transition: transform 0.2s ease-in-out;
+}
+
+.nav-dropdown-toggle[aria-expanded="true"]::after {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 1000;
+  display: none;
+  float: left;
+  min-width: 10rem;
+  padding: 0.5rem 0;
+  margin: 0.125rem 0 0;
+  font-size: 1rem;
+  color: #212529;
+  text-align: left;
+  list-style: none;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 0.25rem;
+}
+
+.dropdown-menu-right {
+  right: auto;
+  left: 0;
+}
+
+.dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 0.25rem 1.5rem;
+  clear: both;
+  font-weight: 400;
+  color: #212529;
+  text-align: inherit;
+  white-space: nowrap;
+  background-color: transparent;
+  border: 0;
+
+}
+
+.dropdown-item:hover, .dropdown-item:focus {
+  color: #fff;
+  background-color: #007bff;
+}
+
+.nav-dropdown-menu {
+  position: absolute;
+  z-index: 1000;
+  display: none;
+  float: left;
+  min-width: 10rem;
+  padding: 10px;
+  font-size: 1rem;
+  color: #212529;
+  text-align: left;
+  list-style: none;
+}
+
+.nav-dropdown-menu a { 
+  color: #212529;
+}
+.nav-dropdown-menu a:hover{ 
+ color: #1a416b;
+}
+
+
+
+
+

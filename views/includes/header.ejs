@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= typeof title == "undefined" ? "Home" : title %></title>
+
+    <link rel="stylesheet" type="text/css" href="../../public/css/header.css" />
+
+    <link
+      rel="stylesheet"
+      href="<%= request.mainURL %>/public/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="<%= request.mainURL %>/public/font-awesome-4.7.0/css/font-awesome.min.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="<%= request.mainURL %>/public/css/style.css"
+    />
+
+    <script src="<%= request.mainURL %>/public/js/vue.global.js"></script>
+  </head>
+
+  <body>
+    <input type="hidden" id="base-url" value="<%= request.mainURL %>" />
+    <script>
+      const baseUrl = document.getElementById("base-url").value;
+    </script>
+
+    <nav class="main-nav">
+      <a class="nav-brand" href="<%= request.mainURL %>">File Transfer</a>
+      <button class="nav-toggle" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="nav-menu">
+        <ul class="nav-list">
+          <li class="nav-item">
+            <a class="nav-link" href="<%= request.mainURL %>">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="<%= request.mainURL %>/MyUploads"
+              >My Uploads</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="<%= request.mainURL %>/MySharedLinks"
+              >My shared links</a
+            >
+          </li>
+          <% if (request.isLogin) { %>
+          <li class="nav-item">
+            <a
+              class="nav-dropdown-toggle nav-link"
+              href="#"
+              aria-haspopup="true"
+              aria-expanded="false"
+              ><%= request.session.user.name %></a
+            >
+            <ul class="nav-dropdown-menu">
+                <a class ="Log-out" href="<%= request.mainURL %>/Logout">Log out</a>
+            </ul>
+          </li>
+          <% } else { %>
+          <li class="nav-item">
+            <a class="nav-link" href="<%= request.mainURL %>/Login">Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="<%= request.mainURL %>/Register"
+              >Register</a
+            >
+          </li>
+          <% } %>
+          <li class="nav-item">
+            <form
+              class="form-inline my-2 my-lg-0"
+              method="GET"
+              action="<%= request.mainURL %>/Search"
+            >
+              <input
+                class="form-control mr-sm-2"
+                type="search"
+                placeholder="Search"
+                name="search"
+                value="<%= request.query.search %>"
+              />
+              <button
+                class="btn btn-outline-success my-2 my-sm-0"
+                type="submit"
+              >
+                Search
+              </button>
+            </form>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    
+    <script>
+      const dropdownToggle = document.querySelector(".nav-dropdown-toggle");
+      const dropdownMenu = document.querySelector(".nav-dropdown-menu");
+      dropdownToggle.addEventListener("click", function () {
+        if (dropdownMenu.style.display === "block") {
+          dropdownMenu.style.display = "none";
+        } else {
+          dropdownMenu.style.display = "block";
+        }
+      });
+    </script>
+  </body>
+</html>
