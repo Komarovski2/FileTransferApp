@@ -558,7 +558,7 @@ http.listen(3000, function () {
                             });
 
                             request.session.status = "success";
-                            request.session.message = "Image has been uploaded. Try our premium version for image compression.";
+                            request.session.message = "Image has been uploaded.";
 
                             result.redirect("/MyUploads/" + _id);
                         });
