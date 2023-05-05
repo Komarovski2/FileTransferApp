@@ -1,0 +1,79 @@
+/* Стилі для контейнера з заголовком */
+.custom-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+    box-sizing: border-box;
+  }
+  
+  /* Стилі для рядка */
+.rowApp {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -15px;
+    margin-left: -15px;
+  }
+  
+  /* Стилі для колонки */
+  .cold12 {
+    flex: 0 0 100%;
+    max-width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    text-align: center;
+  }
+  
+  /* Стилі для контейнера з картками */
+/* Стилі для контейнера з картками */
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  
+  /* Стилі для картки */
+  .card {
+    background-color: #fff;
+    border: 1px solid rgba(0,0,0,.125);
+    border-radius: .25rem;
+    margin-bottom: 30px;
+    position: relative;
+    flex-basis: calc(33.33% - 20px); /* Задає ширину картки відносно батьківського елемента з проміжками між ними */
+    overflow: hidden;
+    transition: transform .2s;
+  }
+  
+  /* Стилі для заголовку картки */
+  .card-header {
+    padding: .75rem 1.25rem;
+    margin-bottom: 0;
+    background-color: rgba(0,0,0,.03);
+    border-bottom: 1px solid rgba(0,0,0,.125);
+  }
+  
+  /* Стилі для зображення в картці */
+  .card-header img {
+    max-width: 100%;
+  }
+  
+  /* Стилі для тіла картки */
+  .card-body {
+    padding: 1.25rem;
+  }
+  
+  /* Стилі для заголовку тіла картки */
+  .card-body h2 {
+    margin-top: 0;
+    margin-bottom: .5rem;
+    font-weight: 500;
+    line-height: 1.2;
+  }
+  
+  /* Стилі для тексту тіла картки */
+  .card-body p {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-weight: 300;
+    line-height: 1.5;
+  }
+  

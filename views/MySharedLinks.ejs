@@ -39,7 +39,7 @@
                                 <h3>
                                     <form method="POST" action="<%= request.mainURL %>/ShareViaLink" id="form-share-via-link" style="display: contents;">
                                         <input type="hidden" name="_id" value="<%= link.hash %>" required />
-                                        <button type="button" class="btn btn-danger" onclick="copyLink('<%= link.hash %>')">Copy Link</button>
+                                        <button type="button" class="btn" style ="background-color: rgb(0,123,255); color:white" onclick="copyLink('<%= link.hash %>')">Copy Link</button>
                                     </form>
                                 </h3>
                             </div>
