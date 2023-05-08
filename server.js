@@ -2,7 +2,12 @@
 var express = require("express");
 var app = express();
 
-// express formidable is used to parse the form data values
+require('dotenv').config();
+
+const googleUser = process.env.GOOGLE_USER;
+const googleKey = process.env.GOOGLE_KEY;
+
+
 var formidable = require("express-formidable");
 app.use(formidable());
 
@@ -10,15 +15,15 @@ app.use(formidable());
 var bcrypt = require("bcrypt");
 var nodemailer = require('nodemailer')
 
-var nodemailerFrom = "komarovski22@gmail.com"
+var nodemailerFrom = "filesharingapp22@gmail.com"
 var nodemailerobject ={
     service:"gmail",
     host: "smtp.gmail.com",
     port:465,
     secure:true,
     auth : {
-        user: "komarovski22@gmail.com",
-        pass: "cbcprwjuhjnptvvp"
+        user: googleUser,
+        pass: googleKey
     }
 }
 
@@ -737,13 +742,6 @@ http.listen(3000, function () {
     }
  });
 
-
-                        // request.status = "success";
-                        // request.message = "Signed up successfully. You can login now.";
-
-                        // result.render("Register", {
-                        //     "request": request
-                        // });
                         
 
         // show page to do the registration
