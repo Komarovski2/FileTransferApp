@@ -746,7 +746,7 @@ http.listen(3000, function () {
 
             if (new_password != confirm_password){
                 request.status = "error";
-                request.message = "Password does not match.TO TUT";
+                request.message = "Password does not match.";
                 
                 result.render ("ResetPassword",{
                     "request":request,
