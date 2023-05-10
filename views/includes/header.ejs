@@ -25,10 +25,42 @@
 
   <body>
     <input type="hidden" id="base-url" value="<%= request.mainURL %>" />
-    <script>
-      const baseUrl = document.getElementById("base-url").value;
-    </script>
 
+<script>
+  var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const baseUrl = document.getElementById("base-url").value;
+</script>
+
+<%
+
+  months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+  formatBytes = function(bytes, decimals = 2) {
+      if (bytes === 0) return '0 Bytes';
+
+      const k = 1024;
+      const dm = decimals < 0 ? 0 : decimals;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+  };
+
+  getFolderSize = function(arr){
+    var sum = 0;
+    for(var a = 0; a < arr.length; a++) {
+      if(arr[a].type == "folder"){
+        if(arr[a].files.length > 0) {
+          sum += getFolderSize(arr[a].files);
+        }
+      } else {
+        sum += arr[a].size;
+      }
+    }
+    return sum;
+  };
+%>
     <nav class="main-nav">
       <a class="nav-brand" href="<%= request.mainURL %>">File Transfer</a>
       <button class="nav-toggle" aria-label="Toggle navigation">
