@@ -522,6 +522,124 @@ http.listen(3000, function () {
             return false;
         });
 
+
+        app.post("/UploadFile", async function (request, result) {
+            if (request.session.user) {
+
+                var user = await database.collection("users").findOne({
+                    "_id": ObjectId(request.session.user._id)
+                });
+                
+                if (request.files.file.size > 0) {
+
+                    const _id = request.fields._id;
+
+                    var uploadedObj = {
+                        "_id": ObjectId(),
+                        "size": request.files.file.size, // in bytes
+                        "name": request.files.file.name,
+                        "type": request.files.file.type,
+                        "filePath": "",
+                        "createdAt": new Date().getTime()
+                    };
+
+                    var filePath = "";
+
+                    if (_id == "") {
+
+                        filePath = "public/uploads/" + user.email + "/" + new Date().getTime() + "-" + request.files.file.name;
+                        uploadedObj.filePath = filePath;
+
+                        if (!fileSystem.existsSync("public/uploads/" + user.email)){
+                            fileSystem.mkdirSync("public/uploads/" + user.email);
+                        }
+              
+                    // Read the file
+                    fileSystem.readFile(request.files.file.path, function (err, data) {
+                        if (err) throw err;
+                        console.log('File read!');
+
+                        // Write the file
+                        fileSystem.writeFile(filePath, data, async function (err) {
+                            if (err) throw err;
+                            console.log('File written!');
+
+                            await database.collection("users").updateOne({
+                                "_id": ObjectId(request.session.user._id)
+                            }, {
+                                $push: {
+                                    "uploaded": uploadedObj
+                                }
+                            });
+
+                            request.session.status = "success";
+                            request.session.message = "Image has been uploaded.";
+
+                            result.redirect("/MyUploads/" + _id);
+                        });
+
+                        // Delete the file
+                        fileSystem.unlink(request.files.file.path, function (err) {
+                            if (err) throw err;
+                            console.log('File deleted!');
+                        });
+                    });
+                    
+                } else {
+                        //if it is a folder
+                    var folderObj = await recursiveGetFolder(user.uploaded, _id);
+
+                    uploadedObj.filePath = folderObj.folderPath + "/" + request.files.file.name;
+
+                    var updatedArray = await getUpdatedArray(user.uploaded, _id, uploadedObj);
+
+                     // Read the file
+                     fileSystem.readFile(request.files.file.path, function (err, data) {
+                        if (err) throw err;
+                        console.log('File read!');
+
+                        // Write the file
+                        fileSystem.writeFile(uploadedObj.filePath, data, async function (err) {
+                            if (err) throw err;
+                            console.log('File written!');
+
+                            for (var a = 0; a < updatedArray.length; a++){
+                                updatedArray[a]._id = ObjectId(updatedArray[a]._id)
+                            }
+
+                            await database.collection("users").updateOne({
+                                "_id":ObjectId(request.session.user._id)
+                            }, {
+                                $set: {
+                                    "uploaded":updatedArray
+                                }
+                            });
+
+                            result.redirect("/MyUploads/" + _id);
+                        });
+
+                        fileSystem.unlink(request.files.file.path, function (err) {
+                            if (err) throw err;
+                            console.log('File deleted!');
+                        });
+                    });
+                }
+
+            } else {
+                    request.status = "error";
+                    request.message = "Please select valid image.";
+
+                    result.render("MyUploads", {
+                        "request": request
+                    });
+                }
+
+                return false;
+            }
+
+            result.redirect("/Login");
+        });
+
         app.post("/CreateFolder", async function (request, result) {
 
             const name = request.fields.name;
@@ -643,7 +761,6 @@ http.listen(3000, function () {
 
         
 
-
         // view all files uploaded by logged-in user
         app.get("/MyUploads", async function (request, result) {
             if (request.session.user) {
@@ -665,79 +782,7 @@ http.listen(3000, function () {
         });
 
         // upload new file
-        app.post("/UploadFile", async function (request, result) {
-            if (request.session.user) {
-
-                var user = await database.collection("users").findOne({
-                    "_id": ObjectId(request.session.user._id)
-                });
-                
-                if (request.files.file.size > 0) {
-
-                    const _id = request.fields._id;
-
-                    var uploadedObj = {
-                        "_id": ObjectId(),
-                        "size": request.files.file.size, // in bytes
-                        "name": request.files.file.name,
-                        "type": request.files.file.type,
-                        "filePath": "",
-                        "createdAt": new Date().getTime()
-                    };
-
-                    var filePath = "public/uploads/" + user.email + "/" + new Date().getTime() + "-" + request.files.file.name;
-                    uploadedObj.filePath = filePath;
-
-                    if (!fileSystem.existsSync("public/uploads/" + user.email)){
-                        fileSystem.mkdirSync("public/uploads/" + user.email);
-                    }
-
-                    // Read the file
-                    fileSystem.readFile(request.files.file.path, function (err, data) {
-                        if (err) throw err;
-                        console.log('File read!');
-
-                        // Write the file
-                        fileSystem.writeFile(filePath, data, async function (err) {
-                            if (err) throw err;
-                            console.log('File written!');
-
-                            await database.collection("users").updateOne({
-                                "_id": ObjectId(request.session.user._id)
-                            }, {
-                                $push: {
-                                    "uploaded": uploadedObj
-                                }
-                            });
-
-                            request.session.status = "success";
-                            request.session.message = "Image has been uploaded.";
-
-                            result.redirect("/MyUploads/" + _id);
-                        });
-
-                        // Delete the file
-                        fileSystem.unlink(request.files.file.path, function (err) {
-                            if (err) throw err;
-                            console.log('File deleted!');
-                        });
-                    });
-                    
-                } else {
-                    request.status = "error";
-                    request.message = "Please select valid image.";
-
-                    result.render("MyUploads", {
-                        "request": request
-                    });
-                }
-
-                return false;
-            }
-
-            result.redirect("/Login");
-        });
-
+       
         // logout the user
         app.get("/Logout", function (request, result) {
             request.session.destroy();

@@ -34,6 +34,9 @@
             <% } %>
 
             <div class="col-md-4">
+
+                <a href="javascript:void(0);" class="btn btn-primary" onclick="selectFileForUpload();">Upload</a>
+
                 <button type="button" class = "btn btn-primary"
                 onclick="onclickCreateFolder();">Create folder </button>
             </div>
@@ -70,8 +73,15 @@
                                         fileSize = formatBytes(singleFile.size);
                                     %>
                                         <h3>
-                                            <%= singleFile.name.substring(0, 10) %>
-                                            <%= (singleFile.name.length > 10) ? "..." : "" %>
+                                           <a href="javascript:void(0);"
+                                           onclick="viewFile(this);"
+                                           data-id=" <% singleFile._id %>"
+                                           data-name = "<% singleFile.name %>"
+                                           data-type="<% singleFile.type %>"
+                                           data-created-at ="<%= singleFile.createdAt %>">
+                                           <%= singleFile.name.substring(0, 10) %>
+                                           <%= (singleFile.name.length > 10) ? "..." : "" %>
+                                           </a>
                                         </h3>
                                     <% } %>
                                 </div>
@@ -94,7 +104,65 @@
         <input type="hidden" name="_id" value = "<%= _id %>"/>
     </form>
 
+    <form method="POST" action="<%= request.mainURL %>/UploadFile" enctype="multipart/form-data" id="form-upload-file">
+        <input type="hidden" name="_id" value="<%= _id %>" />
+        <input type="file" name="file" id="input-file-upload" style="display: none;" onchange="confirmUpload();" required />
+    </form>
+
+    <div class="modal fade" id="viewFileModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class = "modal-title"> </h5>
+                    <button type="button" class="close" data-dismiss ="modal" aria-label = "Close">
+                        <span aria-hidden="true">X</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss ="modal">
+                    Close
+                </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
+
+        function viewFile(self){
+            var _id = self.getAttribute("data-id");
+            var name = self.getAttribute("data-name");
+            var type = self.getAttribute("data-type");
+
+            var createdAt = self.getAttribute("data-created-at");
+            createdAt = parseFloat(createdAt);
+            createdAt = new Date(createdAt);
+            createdAt = createdAt.getDate() + " " + months[createdAt.getMonth()] + ", " 
+            + createdAt.getFullYear() + " " + createdAt.getHours() + ":" 
+            + createdAt.getMinutes() + ":"
+            + createdAt.getSeconds();
+        
+        document.querySelector("#viewFileModal .modal-title").innerHTML = name;
+
+        var modalBodyHtml = "";
+        modalBodyHtml += "<p> Created at: " + createdAt + "</p>";
+        document.querySelector("#viewFileModal .modal-body").innerHTML = modalBodyHtml;
+        $("#viewFileModal").modal("show");
+    }
+
+        function confirmUpload() {
+         if (confirm ("Upload the selected file to the server ?")){
+        document.getElementById("form-upload-file").submit();
+    }
+}
+
+function selectFileForUpload() {
+        document.getElementById("input-file-upload").click();
+    }
+
  function onclickCreateFolder() {
     var folderName = prompt("Please enter foler name","");
 
