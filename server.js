@@ -41,6 +41,8 @@ var http = httpObj.createServer(app);
 // to store files
 var fileSystem = require("fs");
 
+var rimraf = require("rimraf");
+
 // to start the session
 var session = require("express-session");
 app.use(session({
@@ -83,6 +85,26 @@ app.use(function (request, result, next) {
     // continue the request
     next();
 });
+
+function removeFolderReturnUpdated (arr, _id){
+    for (var a = 0; a < arr.length; a++) {
+        if (arr[a].type == "folder") {
+            if (arr[a]._id == _id) {
+
+                rimraf(arr[a].folderPath, function () {
+            
+                });
+                arr.splice(a, 1);
+                break;
+            }
+            if (arr[a].files.length > 0) {
+                arr[a]._id = ObjectId(arr[a]._id);
+                removeFolderReturnUpdated(arr[a].files, _id);
+            }
+        }
+    }
+    return arr;
+}
 
 function recursiveGetFolder (files, _id) {
     var singleFile = null;
@@ -467,6 +489,34 @@ http.listen(3000, function () {
             });
             return false;
         });
+
+        app.post("/DeleteDirectory", async function (request, result) {
+
+            const _id = request.fields._id;
+
+            if(request.session.user){
+                var user = await database.collection("users").findOne({
+                    "_id": ObjectId(request.session.user._id)
+                });
+
+                var updatedArray = await removeFolderReturnUpdated(user.uploaded, _id)
+                for ( var a = 0; a < updatedArray.length; a++ ){
+                    updatedArray[a]._id = ObjectId(updatedArray[a]._id);
+                }
+                await database.collection("users").updateOne({
+                    "_id": ObjectId(request.session.user._id)
+                }, {
+                    $set: {
+                        "uploaded":updatedArray
+                    }
+                });
+
+                const backURL = request.header('Referer') || '/';
+                result.redirect(backURL);
+                return false;
+            }
+            result.redirect("/Login");
+        })
 
         app.post("/DeleteFile", async function (request, result) {
             const _id = request.fields._id;
