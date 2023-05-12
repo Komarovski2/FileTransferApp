@@ -84,31 +84,6 @@ app.use(function (request, result, next) {
     next();
 });
 
-// recursive function to get the file from uploaded
-// function recursiveGetFile (files, _id) {
-//     var singleFile = null;
-
-//     for (var a = 0; a < files.length; a++) {
-//         const file = files[a];
-
-//         // return if file type is not folder and ID is found
-//         if (file.type != "folder") {
-//             if (file._id == _id) {
-//                 return file;
-//             }
-//         }
-
-//         // if it is a folder and have files, then do the recursion
-//         if (file.type == "folder" && file.files.length > 0) {
-//             singleFile = recursiveGetFile(file.files, _id);
-//             // return the file if found in sub-folders
-//             if (singleFile != null) {
-//                 return singleFile;
-//             }
-//         }
-//     }
-// }
-
 function recursiveGetFolder (files, _id) {
     var singleFile = null;
 
@@ -178,6 +153,7 @@ function removeFileReturnUpdated(arr, _id) {
 
     return arr;
 }
+
 
 // recursive function to search uploaded files
 function recursiveSearch (files, query) {
@@ -427,37 +403,7 @@ http.listen(3000, function () {
 
             result.redirect("/Login");
         });
-
-        // delete uploaded file
-        app.post("/DeleteFile", async function (request, result) {
-            const _id = request.fields._id;
-
-            if (request.session.user) {
-                var user = await database.collection("users").findOne({
-                    "_id": ObjectId(request.session.user._id)
-                });
-
-                var updatedArray = await removeFileReturnUpdated(user.uploaded, _id);
-                for (var a = 0; a < updatedArray.length; a++) {
-                    updatedArray[a]._id = ObjectId(updatedArray[a]._id);
-                }
-
-                await database.collection("users").updateOne({
-                    "_id": ObjectId(request.session.user._id)
-                }, {
-                    $set: {
-                        "uploaded": updatedArray
-                    }
-                });
-
-                const backURL = request.header('Referer') || '/';
-                result.redirect(backURL);
-                return false;
-            }
-
-            result.redirect("/Login");
-        });
-
+      
         // download file
         app.post("/DownloadFile", async function (request, result) {
             const _id = request.fields._id;
@@ -522,6 +468,35 @@ http.listen(3000, function () {
             return false;
         });
 
+        app.post("/DeleteFile", async function (request, result) {
+            const _id = request.fields._id;
+        
+            if (request.session.user) {
+                var user = await database.collection("users").findOne({
+                    "_id": ObjectId(request.session.user._id)
+                });
+
+                var updatedArray = await removeFileReturnUpdated(user.uploaded, _id);
+                for (var a = 0; a < updatedArray.length; a++) {
+                    updatedArray[a]._id = ObjectId(updatedArray[a]._id);
+                }
+
+                await database.collection("users").updateOne({
+                    "_id": ObjectId(request.session.user._id)
+                }, {
+                    $set: {
+                        "uploaded": updatedArray
+                    }
+                });
+
+                const backURL = request.header('Referer') || '/';
+                result.redirect(backURL);
+                return false;
+            }
+
+            result.redirect("/Login");
+        });
+        
 
         app.post("/UploadFile", async function (request, result) {
             if (request.session.user) {
@@ -578,11 +553,11 @@ http.listen(3000, function () {
                             result.redirect("/MyUploads/" + _id);
                         });
 
-                        // Delete the file
-                        fileSystem.unlink(request.files.file.path, function (err) {
-                            if (err) throw err;
-                            console.log('File deleted!');
-                        });
+                        // // Delete the file
+                        // fileSystem.unlink(request.files.file.path, function (err) {
+                        //     if (err) throw err;
+                        //     console.log('File deleted!');
+                        // });
                     });
                     
                 } else {
@@ -618,10 +593,10 @@ http.listen(3000, function () {
                             result.redirect("/MyUploads/" + _id);
                         });
 
-                        fileSystem.unlink(request.files.file.path, function (err) {
-                            if (err) throw err;
-                            console.log('File deleted!');
-                        });
+                        // fileSystem.unlink(request.files.file.path, function (err) {
+                        //     if (err) throw err;
+                        //     console.log('File deleted!');
+                        // });
                     });
                 }
 
