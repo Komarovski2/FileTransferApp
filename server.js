@@ -86,8 +86,6 @@ app.use(function (request, result, next) {
     next();
 });
 
-
-
 function removeFolderReturnUpdated (arr, _id){
     console.log(_id)
     for (var a = 0; a < arr.length; a++) {
@@ -113,13 +111,32 @@ function removeFolderReturnUpdated (arr, _id){
     }
     return arr;
 }
+ function recursiveGetFile(files, _id){
+    var singleFile = null;
 
+    for( var a = 0; a < files.length; a++ ){
+        const file = files[a];
+
+        if (file.type != "folder"){
+            if (file._id == _id){
+                return file;
+            }
+        }
+
+        if (file.type == "folder" && file.files.length > 0){
+            singleFile = recursiveGetFile(file.files, _id);
+
+            if (singleFile != null ){
+                return singleFile;
+            }
+        }
+    } 
+ }
 
 
 
 function recursiveGetFolder (files, _id) {
     var singleFile = null;
-
     for (var a = 0; a < files.length; a++) {
         const file = files[a];
 
@@ -127,6 +144,7 @@ function recursiveGetFolder (files, _id) {
         if (file.type == "folder") {
             if (file._id == _id) {
                 return file;
+        
             }
 
         // if it is a folder and have files, then do the recursion
@@ -186,7 +204,6 @@ function removeFileReturnUpdated(arr, _id) {
 
     return arr;
 }
-
 
 // recursive function to search uploaded files
 function recursiveSearch (files, query) {
@@ -261,6 +278,128 @@ http.listen(3000, function () {
         database = client.db("file_transfer");
         console.log("Database connected.");
 
+        app.post("/Share", async function (request, result){
+
+            const _id = request.fields._id;
+            const type = request.fields.type;
+            const email = request.fields.email;
+
+            if(request.session.user){
+                var user = await database.collection("users").findOne({
+                    "email":email
+                });
+
+                if (user == null){
+                    request.session.status = "error";
+                    request.session.message = "User" + email + "does not exists";
+                    result.redirect("/MyUploads")
+
+                    return false
+                }
+                if (!user.isVerified){
+                    request.session.status = "error";
+                    request.session.message = "User" + user.name + "account is not verified.";
+                    result.redirect("/MyUploads")
+
+                    return false;
+                }
+
+                var me = await database.collection("users").findOne({
+                    "_id": ObjectId(request.session.user._id)
+                });
+                
+                 
+                
+
+                var file = null;
+
+                if(type == "folder"){
+                    console.log(file)
+                    file = await recursiveGetFolder(me.uploaded, _id);
+                    console.log(file)
+                } else {
+                    file = await recursiveGetFile(me.uploaded, _id)
+                }
+                    
+
+                if (file == null){
+                    request.session.status = "error";
+                    request.session.message = "File does not exists.";
+                    result.redirect("/MyUploads")
+
+                    return false;
+                }
+                file._id = ObjectId(file._id);
+
+                const sharedBy = me;
+
+            await database.collection("users").findOneAndUpdate({
+                "_id": user._id
+            }, {
+                $push:{
+                    "sharedWithMe":{
+                        "_id":ObjectId(),
+                        "file":file,
+                        "sharedBy":{
+                            "_id": ObjectId(sharedBy._id),
+                            "name":sharedBy.name,
+                            "email":sharedBy.email
+                        },
+                        "createdAt": new Date().getTime()
+                    }
+                }
+            });
+
+            request.session.status = "success";
+            request.session.message = "File has been shared with " + user.name + ".";
+
+            const backURL = request.header("Referer") || "/"
+            result.redirect(backURL)
+        }
+
+        result.redirect("/Login");
+    });
+
+        app.post("/GetUser", async function (request, result){
+            const email = request.fields.email;
+
+            if(request.session.user){
+                var user = await database.collection("users").findOne({
+                    "email": email
+                });
+
+                if (user == null){
+                    result.json({
+                        "status": "error",
+                        "message": "User" + email + "does not exists"
+                    });
+                    return false;
+                }
+
+                if (!user.isVerified){
+                    result.json({
+                        "status": "error",
+                        "message": "User" + user.name + "account is not verified."
+                    });
+                    return false;
+                }
+                result.json({
+                    "status": "success",
+                    "message": "Data has been fetched.",
+                    "user": {
+                        "_id": user._id,
+                        "name": user.name,
+                        "email": user.email
+                    }
+                });
+                return false;
+            }
+            result.json({
+                "status":"error",
+                "message": "Please login to perform this action"
+            });
+            return false;
+        });
 
         app.get("/Admin", async function (request, result) {
             // render an HTML page with number of pages, and posts data
@@ -767,7 +906,11 @@ http.listen(3000, function () {
                         request.status = "error";
                         request.message = "Folder not found.";
                         result.render("MyUploads",{
-                            "request":request
+                            "request":request,
+                            "uploaded":uploaded,
+                            "_id":_id,
+                            "folderName":folderName,
+                            "createdAt":createdAt
                         });
                         return false;
                     }
@@ -779,7 +922,11 @@ http.listen(3000, function () {
                     request.status = "error";
                     request.message = "Directory not found.";
                     result.render("MyUploads",{
-                        "request":request
+                        "request":request,
+                        "uploaded":uploaded,
+                        "_id":_id,
+                        "folderName":folderName,
+                        "createdAt":createdAt
                     });
                     return false;
                 }
