@@ -41,7 +41,7 @@ var http = httpObj.createServer(app);
 // to store files
 var fileSystem = require("fs");
 
-var rimraf = require("rimraf");
+const rimraf = require('rimraf');
 
 // to start the session
 var session = require("express-session");
@@ -86,17 +86,25 @@ app.use(function (request, result, next) {
     next();
 });
 
+
+
 function removeFolderReturnUpdated (arr, _id){
+    console.log(_id)
     for (var a = 0; a < arr.length; a++) {
         if (arr[a].type == "folder") {
             if (arr[a]._id == _id) {
-
-                rimraf(arr[a].folderPath, function () {
-            
-                });
+                
+                try {
+                    fs.rmdirSync(arr[a].folderPath, { recursive: true });
+                    console.log("Done");
+                } catch (err) {
+                    console.log(err);
+                }
+                
                 arr.splice(a, 1);
                 break;
             }
+
             if (arr[a].files.length > 0) {
                 arr[a]._id = ObjectId(arr[a]._id);
                 removeFolderReturnUpdated(arr[a].files, _id);
@@ -105,6 +113,9 @@ function removeFolderReturnUpdated (arr, _id){
     }
     return arr;
 }
+
+
+
 
 function recursiveGetFolder (files, _id) {
     var singleFile = null;
@@ -603,11 +614,11 @@ http.listen(3000, function () {
                             result.redirect("/MyUploads/" + _id);
                         });
 
-                        // // Delete the file
-                        // fileSystem.unlink(request.files.file.path, function (err) {
-                        //     if (err) throw err;
-                        //     console.log('File deleted!');
-                        // });
+                        // Delete the file
+                        fileSystem.unlink(request.files.file.path, function (err) {
+                            if (err) throw err;
+                            console.log('File deleted!');
+                        });
                     });
                     
                 } else {
@@ -643,10 +654,10 @@ http.listen(3000, function () {
                             result.redirect("/MyUploads/" + _id);
                         });
 
-                        // fileSystem.unlink(request.files.file.path, function (err) {
-                        //     if (err) throw err;
-                        //     console.log('File deleted!');
-                        // });
+                        fileSystem.unlink(request.files.file.path, function (err) {
+                            if (err) throw err;
+                            console.log('File deleted!');
+                        });
                     });
                 }
 
