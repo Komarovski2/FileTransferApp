@@ -278,6 +278,51 @@ http.listen(3000, function () {
         database = client.db("file_transfer");
         console.log("Database connected.");
 
+        app.post ("/GetFileSharedWith", async function (request, result){
+            const _id = request.fields._id;
+
+            if(request.session.user){
+                const tempUsers = await database.collection("users").find({
+                    $and: [{
+                        "sharedWithMe.file._id":ObjectId(_id)
+                    }, {
+                        "sharedWithMe.sharedBy._id": ObjectId(request.session.user._id)
+                    }]
+                }).toArray();
+
+                var users = [];
+                for (var a = 0; a < tempUsers.length; a++){
+                    var sharedObj = null;
+                    for (var b = 0; b < tempUsers[a].sharedWithMe.length; b++){
+                        if(tempUsers[a].sharedWithMe[b].file._id == _id){
+                            sharedObj = {
+                                "_id":tempUsers[a].sharedWithMe[b]._id,
+                                "sharedAt":tempUsers[a].sharedWithMe[b].createdAt,
+                            };
+                        }
+                    }
+
+                    users.push({
+                        "_id":tempUsers[a]._id,
+                        "name":tempUsers[a].name,
+                        "email":tempUsers[a].email,
+                        "sharedObj":sharedObj
+                    });
+                }
+                result.json({
+                    "status":"success",
+                    "message":"Record has been fetched.",
+                    "users":users
+                });
+                return false;
+            }
+
+            result.json({
+                "status":"error",
+                "message":"Please login to perform this action."
+        });
+    });
+
         app.post("/Share", async function (request, result){
 
             const _id = request.fields._id;
