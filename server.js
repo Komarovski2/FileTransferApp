@@ -278,6 +278,47 @@ http.listen(3000, function () {
         database = client.db("file_transfer");
         console.log("Database connected.");
 
+        //remove shared access
+        app.post("/RemoveSharedAccess", async function (request, result){
+            const _id = request.fields._id;
+
+            if (request.session.user) {
+                const user = await database.collection("users").findOne({
+                    $and: [{
+                        "sharedWithMe._id": ObjectId(_id)
+                    }, {
+                        "sharedWithMe.sharedBy._id":ObjectId(request.session.user._id)
+                    }]
+                });
+
+                //remove from array
+                for (var a = 0; a < user.sharedWithMe.length; a++){
+                    if (user.sharedWithMe[a]._id == _id){
+                        user.sharedWithMe.splice(a, 1);
+                    }
+                }
+                await database.collection("users").findOneAndUpdate({
+                    $and: [{
+                        "sharedWithMe._id": ObjectId(_id)
+                    }, {
+                        "sharedWithMe.sharedBy._id":ObjectId(request.session.user._id)
+                    }]
+                }, {
+                    $set:{
+                        "sharedWithMe":user.sharedWithMe
+                    }
+                });
+
+                request.session.status = "success";
+                request.session.message = "Shared access has been removed.";
+
+                const backURL = request.header('Referer') || '/';
+                result.redirect(backURL);
+                return false;
+            }
+            result.redirect("/Login")
+        });
+
         app.post ("/GetFileSharedWith", async function (request, result){
             const _id = request.fields._id;
 
