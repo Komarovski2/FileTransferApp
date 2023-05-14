@@ -11,7 +11,7 @@
         <div class="col-md-4">
             <h1>
                 
-                 <% if (typeof folderName !== "undefined"){ %>
+                 <% if ( folderName == ""){ %>
                     My Uploads
                     <%  } else { %>
                         <%= folderName %>
@@ -48,7 +48,6 @@
                         </button>
 
                         <ul class="dropdown-menu">
-
                             <li>
                                 <button type="button" class = "btn btn-primary
                                 btn-block" onclick="showShareModal(this);"
@@ -71,7 +70,7 @@
                                 <form method="POST" action="<%= request.mainURL %>/DeleteDirectory" 
                                     onsubmit="return confirm('Are you sure you want to delete this folder and all files in it?');">
                                     <input type="hidden" name = "_id" value="<%= _id %>" required> 
-                                    <input type="submit" value = "Delete" class ="btn btn-danger btn-block" />
+                                    <input type="submit" value ="Delete" class = "btn btn-danger btn-block" />
                                 </form>
                             </li>
                         </ul>
@@ -87,8 +86,10 @@
 
         
         <div class="row">
-            <% uploaded.forEach(function (singleFile) {
-                var fileSize = 0;
+            
+            <% if (uploaded) { %>
+            <% 
+            uploaded.forEach(function (singleFile) {
             %>
                 <div class="col-md-4" style="margin-top: 30px;">
                     <div class="card">
@@ -119,7 +120,7 @@
                                            <a href="javascript:void(0);"
                                            onclick="viewFile(this);"
                                            data-id="<%= singleFile._id %>"
-                                           data-name = "<%= singleFile.name %>"
+                                           data-name ="<%= singleFile.name %>"
                                            data-type="<%= singleFile.type %>"
                                            data-created-at ="<%= singleFile.createdAt %>">
                                            <%= singleFile.name.substring(0, 10) %>
@@ -138,6 +139,8 @@
                     </div>
                 </div>
             <% }); %>
+            <% } %>
+
         </div>
         
 
@@ -165,8 +168,17 @@
 
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss ="modal">
+                <button type="button" class="btn btn-default" data-dismiss ="modal">
                     Close
+                </button>
+
+                <button type="button" class="btn btn-primary"
+                    onclick="showShareModal(this);"
+                    data-dismiss="modal"
+                    data-id=""
+                    data-type=""
+                    id="button-share-file">
+                    Share
                 </button>
 
                 <form method="POST" action="<%= request.mainURL %>/DeleteFile"
@@ -391,6 +403,8 @@
 
         document.getElementById("form-delete-file")._id.value = _id;
         
+        document.getElementById("button-share-file").setAttribute("data-id", _id)
+        document.getElementById("button-share-file").setAttribute("data-type", type)
 
     }
 
