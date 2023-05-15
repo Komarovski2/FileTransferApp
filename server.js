@@ -327,6 +327,28 @@ function recursiveSearchShared (files, query) {
     }
 }
 
+        function recursiveGetSharedFile (files, _id){
+            var singleFile = null;
+
+            for (var a = 0; a <files.length; a++){
+                var file = (typeof files[a].file === "undefined") ? files[a]:files[a].file;
+
+                if (file.type != "folder") {
+                    if (file._id == _id){
+                        return file;
+                    }
+                }
+                if (file.type == "folder" && file.files.length > 0){
+                    singleFile = recursiveGetSharedFile(file.files,_id)
+
+                    if(singleFile != null){
+                        return singleFile;
+                    }
+                }
+            }
+        }
+
+
 // start the http server
 http.listen(3000, function () {
     console.log("Server started at " + mainURL);
@@ -546,6 +568,7 @@ http.listen(3000, function () {
 
                     return false
                 }
+
                 if (!user.isVerified){
                     request.session.status = "error";
                     request.session.message = "User" + user.name + "account is not verified.";
@@ -559,20 +582,16 @@ http.listen(3000, function () {
                 });
                 
                 var file = null;
-
                 if(type == "folder"){
-                    console.log(file)
                     file = await recursiveGetFolder(me.uploaded, _id);
-                    console.log(file)
                 } else {
                     file = await recursiveGetFile(me.uploaded, _id)
                 }
                     
-
                 if (file == null){
                     request.session.status = "error";
                     request.session.message = "File does not exists.";
-                    result.redirect("/MyUploads")
+                    result.redirect("/MyUploads");
 
                     return false;
                 }
@@ -600,11 +619,10 @@ http.listen(3000, function () {
             request.session.status = "success";
             request.session.message = "File has been shared with " + user.name + ".";
 
-            const backURL = request.header("Referer") || "/"
+            const backURL = request.header("Referer") || "/";
             result.redirect(backURL)
         }
-
-        result.redirect("/Login");
+        //Якщо це не убрати видає warning, пока не провірено чи не мішає result.redirect("/Login");
     });
 
         app.post("/GetUser", async function (request, result){
@@ -827,35 +845,16 @@ http.listen(3000, function () {
         app.post("/DownloadFile", async function (request, result) {
             const _id = request.fields._id;
 
-            var link = await database.collection("public_links").findOne({
-                "file._id": ObjectId(_id)
-            });
-
-            if (link != null) {
-                fileSystem.readFile(link.file.filePath, function (error, data) {
-                    // console.log(error);
-
-                    result.json({
-                        "status": "success",
-                        "message": "Data has been fetched.",
-                        "arrayBuffer": data,
-                        "fileType": link.file.type,
-                        // "file": mainURL + "/" + file.filePath,
-                        "fileName": link.file.name
-                    });
-                });
-                return false;
-            }
-
             if (request.session.user) {
 
                 var user = await database.collection("users").findOne({
                     "_id": ObjectId(request.session.user._id)
                 });
 
-                var fileUploaded = await recursiveGetFolder(user.uploaded, _id);
+                var fileUploaded = await recursiveGetFile(user.uploaded, _id);
+                var fileShared = await recursiveGetSharedFile(user.sharedWithMe,_id)
                 
-                if (fileUploaded == null) {
+                if (fileUploaded == null && fileShared == null) {
                     result.json({
                         "status": "error",
                         "message": "File is neither uploaded nor shared with you."
@@ -863,7 +862,7 @@ http.listen(3000, function () {
                     return false;
                 }
 
-                var file = fileUploaded;
+                var file = (fileUploaded == null) ? fileShared: fileUploaded;
 
                 fileSystem.readFile(file.filePath, function (error, data) {
                     // console.log(error);
@@ -873,7 +872,6 @@ http.listen(3000, function () {
                         "message": "Data has been fetched.",
                         "arrayBuffer": data,
                         "fileType": file.type,
-                        // "file": mainURL + "/" + file.filePath,
                         "fileName": file.name
                     });
                 });
@@ -1189,8 +1187,6 @@ http.listen(3000, function () {
             }
             result.redirect("/Login")
         });
-
-        
 
         // view all files uploaded by logged-in user
         app.get("/MyUploads", async function (request, result) {

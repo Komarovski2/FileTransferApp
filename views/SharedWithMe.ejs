@@ -112,7 +112,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title"></h5>
-                    <button type="button" class="close" data-dissmiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">x</span>
                     </button>
                 </div>
@@ -121,9 +121,8 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dissmiss="modal">
-                        Close
-                    </button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        Close</button>
                     <form method="POST" action="<%= request.mainURL %>/DeleteSharedFile"
                         id="form-delete-file">
                         <input type="hidden" name="_id" required />
@@ -154,6 +153,8 @@
 
         var modalBodyHtml = "";
         modalBodyHtml += "<p> Created at: " + createdAt + "</p>";
+        modalBodyHtml += "<button type='button' class='btn btn-success' onclick='downloadFile(this);' data-id='" 
+        + _id + "'>Download</button>";
         document.querySelector("#viewFileModal .modal-body").innerHTML = modalBodyHtml;
         $("#viewFileModal").modal("show");
 

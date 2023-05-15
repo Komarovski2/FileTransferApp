@@ -398,6 +398,8 @@
 
         var modalBodyHtml = "";
         modalBodyHtml += "<p> Created at: " + createdAt + "</p>";
+        modalBodyHtml += "<button type='button' class='btn btn-success' onclick='downloadFile(this);' data-id='" 
+        + _id + "'>Download</button>";
         document.querySelector("#viewFileModal .modal-body").innerHTML = modalBodyHtml;
         $("#viewFileModal").modal("show");
 
