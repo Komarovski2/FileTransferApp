@@ -1185,7 +1185,7 @@ http.listen(3000, function () {
                     "folderName":folderName,
                     "createdAt":createdAt
                 });
-
+                return false;
             }
             result.redirect("/Login")
         });
