@@ -48,6 +48,17 @@
                         </button>
 
                         <ul class="dropdown-menu">
+
+                            <li>
+                                <button type="button" class="btn btn-default btn-block"
+                                onclick="renameFolder(this);"
+                                data-dismiss="modal"
+                                data-id="<%= _id %>"
+                                data-name="<%= folderName %>">
+                                Rename
+                                </button>
+                            </li>
+
                             <li>
                                 <button type="button" class = "btn btn-primary
                                 btn-block" onclick="showShareModal(this);"
@@ -172,6 +183,15 @@
                     Close
                 </button>
 
+                <button type="button" class="btn btn-warning"
+                onclick="renameFile(this);"
+                data-dismiss="modal"
+                data-id=""
+                data-name=""
+                id="button-rename-file">
+                Rename
+                </button>
+
                 <button type="button" class="btn btn-primary"
                     onclick="showShareModal(this);"
                     data-dismiss="modal"
@@ -275,7 +295,43 @@
         </div>
     </div>
 
+    <form method="POST" action="<%= request.mainURL %>/RenameFolder" id="form-rename-folder">
+        <input type="hidden" name="_id" required />
+        <input type="hidden" name="name" required />
+    </form>
+
+    <form method="POST" action="<%= request.mainURL %>/RenameFile" id="form-rename-file">
+        <input type="hidden" name="_id" required />
+        <input type="hidden" name="name" required />
+    </form>
+
     <script>
+
+            function renameFile(self){
+                const _id = self.getAttribute("data-id");
+                const name = self.getAttribute("data-name");
+
+                var newName = prompt("Enter new name", name);
+                if (newName != null){
+                    document.getElementById("form-rename-file")._id.value = _id;
+                    document.getElementById("form-rename-file").name.value = newName;
+
+                    document.getElementById("form-rename-file").submit();
+                }
+            }
+
+            function renameFolder(self){
+                const _id = self.getAttribute("data-id");
+                const name = self.getAttribute("data-name");
+
+                var newName = prompt("Enter new name", name);
+                if (newName != null){
+                    document.getElementById("form-rename-folder")._id.value = _id;
+                    document.getElementById("form-rename-folder").name.value = newName;
+
+                    document.getElementById("form-rename-folder").submit();
+                }
+            }
 
         function showSharedWithModal(self) {
             const _id = self.getAttribute("data-id");
@@ -408,6 +464,8 @@
         document.getElementById("button-share-file").setAttribute("data-id", _id)
         document.getElementById("button-share-file").setAttribute("data-type", type)
 
+        document.getElementById("button-rename-file").setAttribute("data-id", _id)
+        document.getElementById("button-rename-file").setAttribute("data-name", name)
     }
 
         function confirmUpload() {
