@@ -12,17 +12,43 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="jumbotron">
+                    <p style="font-size: 100px;">
+                        <% if (link.file.type == "folder") { %>
+                            <i class="fa fa-folder-open-o"></i>
+                            <% } else { %>
+                            <i class="fa fa-file-text-o"></i>
+                            <% } %>
+                    </p>
+                <h1>
+                    <%= link.file.type == "folder" ? link.file.folderName
+                    : link.file.name %>
+                </h1>
+                <br />
+                    <p>
+                        <%
+                        var createdAt = link.file.createdAt;
+                        createdAt = parseFloat(createdAt);
+                        createdAt = new Date(createdAt);
+                        createdAt = createdAt.getDate() + " " + months[createdAt.getMonth()] + ", " 
+                        + createdAt.getFullYear() + " " + createdAt.getHours() + ":" 
+                        + createdAt.getMinutes() + ":"
+                        + createdAt.getSeconds();
+                        %>
 
-                    <i style="font-size: 100px;" class="fa fa-file-text-o"></i>
-                    <h1><%= link.file.name %></h1>
+                        Created at: <%= createdAt %>
+                    </p>
 
-                    <br />
+                    <p>
+                        Size:
+                        <%= link.file.type == "folder" ? formatBytes(
+                            getFolderSize(link.file.files)) : formatBytes(
+                                link.file.size) %>
+                    </p>
 
                     <button type="button"
                         class="btn btn-success"
                         onclick="downloadFile(this);"
                         data-id="<%= link.file._id %>">Download</button>
-
                 </div>
             </div>
         </div>

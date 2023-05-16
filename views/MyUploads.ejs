@@ -194,6 +194,24 @@
                     Close
                 </button>
 
+                <form method="POST" action="<%= request.mainURL %>/ShareViaLink"
+                    id="form-share-via-link" style="display: contents;">
+                    <input type="hidden" name="_id" required />
+                </form>
+                <button type="button" class="btn btn-primary"
+                onclick="shareViaLink();">
+                    Share via link
+                </button>
+
+                <script>
+                    function shareViaLink(){
+                        if (confirm("Generate shareable link?")) {
+                            document.getElementById("form-share-via-link").submit();
+                        }
+                    }
+                </script>
+
+
                 <button type="button" class="btn btn-warning"
                 onclick="renameFile(this);"
                 data-dismiss="modal"
@@ -567,6 +585,8 @@
 
         document.getElementById("button-rename-file").setAttribute("data-id", _id)
         document.getElementById("button-rename-file").setAttribute("data-name", name)
+
+        document.getElementById("form-share-via-link")._id.value = _id;
     }
 
         function confirmUpload() {
