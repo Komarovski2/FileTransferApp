@@ -50,6 +50,17 @@
                         <ul class="dropdown-menu">
 
                             <li>
+                                <button type="button" class="btn btn-warning btn-block"
+                                onclick="moveFolder(this);"
+                                data-dismiss="modal"
+                                data-id="<%= _id %>"
+                                data-name="<%= folderName %>"
+                                data-type="folder">
+                                Move
+                                </button>
+                            </li>
+
+                            <li>
                                 <button type="button" class="btn btn-default btn-block"
                                 onclick="renameFolder(this);"
                                 data-dismiss="modal"
@@ -305,7 +316,97 @@
         <input type="hidden" name="name" required />
     </form>
 
+        <div class="modal fade" id="moveModal">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title"></h4>
+                        <button type="button" class="close" data-dismiss="modal"
+                            aria-label="Close">
+                            <span aria-hidden="true">x</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="loading"></p>
+                        <h3>Move to:</h3>
+
+                        <form method="POST" action="<%= request.mainURL %>/MoveFile"
+                            id="form-move-file">
+                                <input type="hidden" name="_id" required />
+                                <input type="hidden" name="type" required />
+
+                                <div class="all-folders"></div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">
+                            Close
+                        </button>
+
+                        <button type="submit" class="btn btn-primary" form="form-move-file">
+                            Move
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     <script>
+
+        function moveFolder(self) {
+            const _id = self.getAttribute("data-id");
+            const name = self.getAttribute("data-name");
+            const type = self.getAttribute("data-type");
+
+
+            $("#moveModal").modal("show")
+            document.querySelector("#moveModal .loading").innerHTML = "Loading...";
+
+            document.getElementById("form-move-file")._id.value = _id;
+            document.getElementById("form-move-file").type.value = type;
+
+            document.querySelector("#moveModal .modal-title").innerHTML = name;
+
+            var ajax = new XMLHttpRequest();
+            ajax.open("POST", document.getElementById("base-url").value + "/GetAllFolders", true);
+
+            ajax.onreadystatechange = function () {
+                if (this.readyState == 4){
+                    if (this.status == 200) {
+                        var data = JSON.parse(this.responseText);
+
+                        document.querySelector("#moveModal .loading").innerHTML = "";
+
+                        if(data.status == "error") {
+                            swal("Error", data.message, "error");
+                        }
+
+                        if(data.status == "success"){
+                            var html = "";
+                            for (var a = 0; a < data.folders.length; a++){
+                                const folder = data.folders[a];
+                                html += `<div class = "form-group">
+                                    <label>
+                                        <input type = "radio" name = "folder" value ="` 
+                                        + folder._id + `" required />
+                                        ` + folder.folderName + `
+                                        </label>
+                                    </div>`;
+                            }
+                            document.querySelector("#form-move-file .all-folders").innerHTML = html;
+                        }
+                    }
+                    if (this.status == 500) {
+                        console.log(this.responseText);
+                    }
+                }
+            };
+
+            var formData = new FormData();
+            formData.append("_id", _id);
+            formData.append("type",type);
+            ajax.send(formData);
+        }
 
             function renameFile(self){
                 const _id = self.getAttribute("data-id");
