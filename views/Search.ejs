@@ -29,7 +29,9 @@
                             var createdAt = file.createdAt;
                             createdAt = parseFloat(createdAt);
                             createdAt = new Date(createdAt);
-                            createdAt = createdAt.getDate() + " " + months[createdAt.getMonth()] + ", " + createdAt.getFullYear() + " " + createdAt.getHours() + ":" + createdAt.getMinutes() + ":" + createdAt.getSeconds();
+                            createdAt = createdAt.getDate() + " " + months[createdAt.getMonth()] 
+                            + ", " + createdAt.getFullYear() + " " + createdAt.getHours() 
+                            + ":" + createdAt.getMinutes() + ":" + createdAt.getSeconds();
                         %>
 
                         Created at: <%= createdAt %>

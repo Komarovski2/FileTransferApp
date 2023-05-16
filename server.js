@@ -527,6 +527,8 @@ http.listen(3000, function () {
         database = client.db("file_transfer");
         console.log("Database connected.");
 
+        
+
         app.post("/GetAllFolders", async function (request, result) {
             const _id = request.fields._id;
             const type = request.fields.type;
