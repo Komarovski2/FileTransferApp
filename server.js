@@ -1212,11 +1212,11 @@ http.listen(3000, function () {
                 });
 
                 const backURL = request.header('Referer') || '/';
-                result.redirect(backURL);
+                result.redirect("/MyUploads");
                 return false;
             }
             result.redirect("/Login");
-        })
+        });
 
         app.post("/DeleteFile", async function (request, result) {
             const _id = request.fields._id;
@@ -1838,22 +1838,6 @@ http.listen(3000, function () {
                 "request": request
             });
         });
-
-        app.get("/FastUpload", function (request, result) {
-            result.render("FastUpload", {
-                "request": request
-            });
-        });
-
-    
-
-          
-        // app.get('/Compression', (request, result) => {
-        //     result.render("Compression", {
-        //       "request": request,
-        //     });
-        //  
-        
 
 
 });

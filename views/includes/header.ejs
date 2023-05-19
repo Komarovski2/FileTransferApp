@@ -139,6 +139,7 @@
     <script>
       const dropdownToggle = document.querySelector(".nav-dropdown-toggle");
       const dropdownMenu = document.querySelector(".nav-dropdown-menu");
+      if(dropdownToggle){
       dropdownToggle.addEventListener("click", function () {
         if (dropdownMenu.style.display === "block") {
           dropdownMenu.style.display = "none";
@@ -146,6 +147,7 @@
           dropdownMenu.style.display = "block";
         }
       });
+    }
     </script>
   </body>
 </html>

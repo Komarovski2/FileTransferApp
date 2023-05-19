@@ -1,20 +1,15 @@
-/* Стилі для контейнера з заголовком */
 .custom-container {
-    max-width: 1200px;
+    max-width: 600px;
     margin: 0 auto;
     padding: 0 15px;
     box-sizing: border-box;
   }
-  
-  /* Стилі для рядка */
 .rowApp {
     display: flex;
     flex-wrap: wrap;
     margin-right: -15px;
     margin-left: -15px;
   }
-  
-  /* Стилі для колонки */
   .cold12 {
     flex: 0 0 100%;
     max-width: 100%;
@@ -22,58 +17,33 @@
     padding-left: 15px;
     text-align: center;
   }
-  
-  /* Стилі для контейнера з картками */
-/* Стилі для контейнера з картками */
-.card-container {
+
+
+  :root {
+    --main-bg-color: #edf5fe;
+    --border-color: #0288d147;
+  }
+
+  body,html {
+  font-family: system-ui;
+  background: var(--main-bg-color);
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  }
+
+  .upload-container{
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border-radius: 25px;
+    box-shadow: 0px 20px 20px #0000002e;
   }
-  
-  /* Стилі для картки */
-  .card {
-    background-color: #fff;
-    border: 1px solid rgba(0,0,0,.125);
-    border-radius: .25rem;
-    margin-bottom: 30px;
-    position: relative;
-    flex-basis: calc(33.33% - 20px); /* Задає ширину картки відносно батьківського елемента з проміжками між ними */
-    overflow: hidden;
-    transition: transform .2s;
+  .drop-zone{
+    width: 500px;
+    min-height: 200px;
+    border: 2px dashed var(--border-color);
+    margin: 30px;
+    border-radius: 10px;
   }
-  
-  /* Стилі для заголовку картки */
-  .card-header {
-    padding: .75rem 1.25rem;
-    margin-bottom: 0;
-    background-color: rgba(0,0,0,.03);
-    border-bottom: 1px solid rgba(0,0,0,.125);
-  }
-  
-  /* Стилі для зображення в картці */
-  .card-header img {
-    max-width: 100%;
-  }
-  
-  /* Стилі для тіла картки */
-  .card-body {
-    padding: 1.25rem;
-  }
-  
-  /* Стилі для заголовку тіла картки */
-  .card-body h2 {
-    margin-top: 0;
-    margin-bottom: .5rem;
-    font-weight: 500;
-    line-height: 1.2;
-  }
-  
-  /* Стилі для тексту тіла картки */
-  .card-body p {
-    margin-top: 0;
-    margin-bottom: 1rem;
-    font-weight: 300;
-    line-height: 1.5;
-  }
-  
