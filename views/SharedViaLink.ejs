@@ -16,7 +16,24 @@
                         <% if (link.file.type == "folder") { %>
                             <i class="fa fa-folder-open-o"></i>
                             <% } else { %>
-                            <i class="fa fa-file-text-o"></i>
+                                <% var extension = link.file.name.split('.').pop().toLowerCase(); %>
+                                <% if (extension == "pdf") { %>
+                                    <i class="fa fa-file-pdf-o"></i>
+                                <% } else if (extension == "doc" || extension == "docx") { %>
+                                    <i class="fa fa-file-word-o"></i>
+                                <% } else if (extension == "jpg" || extension == "jpeg" || extension == "png" || extension == "gif") { %>
+                                    <i class="fa fa-file-image-o"></i>
+                                    <% } else if (extension == "zip" || extension == "rar" || extension == "7z") { %>
+                                    <i class="fa fa-file-archive-o"></i>
+                                <% } else if (extension == "xls" || extension == "xlsx") { %>
+                                    <i class="fa fa-file-excel-o"></i>
+                                <% } else if (extension == "ppt" || extension == "pptx") { %>
+                                    <i class="fa fa-file-powerpoint-o"></i>
+                                <% } else if (extension == "txt") { %>
+                                    <i class="fa fa-file-text-o"></i>
+                                <% } else { %>
+                                    <i class="fa fa-file-o"></i>
+                                <% } %>
                             <% } %>
                     </p>
                 <h1>

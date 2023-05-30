@@ -56,50 +56,66 @@
                 <div class="col-md-4" style="margin-top: 30px;">
 
                     <div class="card">
-                        <div class="card-body" style="font-size: 100px;text-align: center; height: 300px;">
-                            <% if (singleFile.type == "folder"){ %>
+                        <div class="card-body" style="font-size: 100px; text-align: center;height: 200px;">
+                            <% if (singleFile.type == "folder") { %>
                                 <i class="fa fa-folder-open-o"></i>
+                            <% } else { %>
+                                <% var extension = singleFile.name.split('.').pop().toLowerCase(); %>
+                                <% if (extension == "pdf") { %>
+                                    <i class="fa fa-file-pdf-o"></i>
+                                <% } else if (extension == "doc" || extension == "docx") { %>
+                                    <i class="fa fa-file-word-o"></i>
+                                <% } else if (extension == "jpg" || extension == "jpeg" || extension == "png" || extension == "gif") { %>
+                                    <i class="fa fa-file-image-o"></i>
+                                    <% } else if (extension == "zip" || extension == "rar" || extension == "7z") { %>
+                                    <i class="fa fa-file-archive-o"></i>
+                                <% } else if (extension == "xls" || extension == "xlsx") { %>
+                                    <i class="fa fa-file-excel-o"></i>
+                                <% } else if (extension == "ppt" || extension == "pptx") { %>
+                                    <i class="fa fa-file-powerpoint-o"></i>
+                                <% } else if (extension == "txt") { %>
+                                    <i class="fa fa-file-text-o"></i>
                                 <% } else { %>
-                                <i class="fa fa-file-text-o"></i>
+                                    <i class="fa fa-file-o"></i>
                                 <% } %>
+                            <% } %>
                         </div>
-
-                        <div class="card-footer">
+                        
+                        <div class="card-footer" style="padding: 0.5rem 0.75rem;">
                             <div class="row">
                                 <div class="col-md-8">
-                                    <% if (singleFile.type == "folder"){
+                                    <% if (singleFile.type == "folder") {
                                         fileSize = getFolderSize(singleFile.files);
                                         fileSize = formatBytes(fileSize);
-                                        %>
+                                    %>
                                         <h3>
-                                            <a href="<%= request.mainURL + '/SharedWithMe/' + singleFile._id %>">
+                                            <a  href="<%= request.mainURL + '/MyUploads/' + singleFile._id %>" style="font-size: 1.4rem;">
                                                 <%= singleFile.folderName.substring(0, 10) %>
-                                                <%= (singleFile.folderName.length > 10) ? "...":"" %>
+                                                <%= (singleFile.folderName.length > 10) ? "..." : "" %>
                                             </a>
                                         </h3>
-                                        <% } else {
-                                            fileSize = formatBytes(singleFile.size);
-                                            %>
-                                            <h3>
-                                                <a href="javascript:void(0);"
-                                                onclick="viewFile(this);"
-                                                data-id="<%= singleFile._id %>"
-                                                data-name="<%= singleFile.name %>"
-                                                data-type="<%= singleFile.type %>"
-                                                data-created-at="<%= singleFile.createdAt %>">
-                                                <%= singleFile.name.substring(0, 10) %>
-                                                <%= (singleFile.name.length > 10) ? "...":"" %>
-                                                </a>
-                                            </h3>
-                                        <% } %>
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <p style="position: relative;top: 10px;">
-                                            <%= fileSize %> </p>
-                                    </div>
+                                    <% } else {
+                                        fileSize = formatBytes(singleFile.size);
+                                    %>
+                                        <h3>
+                                           <a style="font-size: 1.4rem;" href="javascript:void(0);"
+                                           onclick="viewFile(this);"
+                                           data-id="<%= singleFile._id %>"
+                                           data-name ="<%= singleFile.name %>"
+                                           data-type="<%= singleFile.type %>"
+                                           data-created-at ="<%= singleFile.createdAt %>">
+                                           <%= singleFile.name.substring(0, 15) %>
+                                           <%= (singleFile.name.length > 15) ? "..." : "" %>
+                                           </a>
+                                        </h3>
+                                    <% } %>
                                 </div>
-
+                                <div class="col-md-4">
+                                    <p style="position: relative; top:10px;">
+                                        <%= fileSize %>
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
