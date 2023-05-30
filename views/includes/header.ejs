@@ -62,7 +62,7 @@
   };
 %>
     <nav class="main-nav">
-      <a class="nav-brand" href="<%= request.mainURL %>">File Transfer</a>
+      <a class="nav-brand" style="text-decoration: none;" href="<%= request.mainURL %>" >File Transfer</a>
       <button class="nav-toggle" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -125,7 +125,7 @@
                 value="<%= request.query.search %>"
               />
               <button
-                class="btn btn-outline-success my-2 my-sm-0"
+                class="btn btn-outline-success my-2 my-sm-0" style="font-size: 0.88rem;"
                 type="submit"
               >
                 Search

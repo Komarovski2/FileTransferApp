@@ -1,30 +1,139 @@
- <%- include ("includes/header") %>
- <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" type="text/css" href="../public/css/index.css" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
-    </head>
-    <body>
-     <div class="custom-container" id="features">
-         <div class="rowApp">
-             <div class="cold12">
-                 <h1>File Transfer Web App</h1>
-                 <p>Node JS and Mongo DB</p>
-             </div>
-         </div>
-        
-         
-        <section class="upload-container">
-            <div class="drop-zone">
-                <div class="icon-container">
-                    <img src="../public/img/file.svg" alt="file icon">
-                </div>
-            </div>
-        </section>
-    </div> 
-    </body>
-    </html>
+<%- include ("includes/header") %>
+<!DOCTYPE HTML>
+
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" type="text/css" href="../public/css/main.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+
+  
+
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Header -->
+			<section id="header">
+				<div class="inner">
+					<span class="icon solid major fa-cloud"></span>
+					<h1>WebTransfer<br/>
+          Багатокористувацька веб-платформа для потокового обміну файлами</h1>
+						<p>Тут ви можете завантажувати, скачувати та поширювати ваші файли.<br />
+              Щоб почати натисніть на кнопку Get Started</p>
+					<ul class="actions special">
+						<li><a href="<%= request.mainURL %>/MyUploads" class="button scrolly">Get Started</a></li>
+					</ul>
+				</div>
+			</section>
+
+		<!-- Three -->
+    <section id="three" class="main style1 special">
+      <div class="container">
+        <header class="major">
+          <h2> Можливості WebTransfer</h2>
+        </header>
+        <p>WebTransfer гарантує захист ваших файлів їх конфедеційність, <br />
+          можливість поширювати файли між користувачами платформи<br /> 
+        та створювати загальні посилання на файли</p>
+        <div class="row gtr-150">
+          <div class="col-4 col-12-medium">
+            <span class="image fit"><img src="../public/img/MenuFile.png" alt="" /></span>
+            <h3>Надійний захист</h3>
+            <p> Для захисту даних користувачів використовується система реєстрація/аутентифікація
+              а також шифрування паролів та верифікація аккаунтів
+            </p>
+
+          </div>
+          <div class="col-4 col-12-medium">
+            <span class="image fit"><img src="../public/img/MenuFile2.png" style="width: 160px;height: 160px;" alt="" /></span>
+            <h3>Обмін файлами</h3>
+            <p>Користувачі мають змогу обмінюватись файлами в середині платформи за допомогою 
+              функції Shared with me</p>
+
+          </div>
+          <div class="col-4 col-12-medium">
+            <span class="image fit"><img src="../public/img/MenuFile3.png" style="width: 140px;height: 140px;" alt="" /></span>
+            <h3> Загальні посилань</h3>
+            <p>Користувачі можуть створювати загальні посилання на файли, 
+              доступ до яких буде у всіх у кого є посилання</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+		<!-- Two -->
+			<section id="two" class="main style2">
+				<div class="container">
+					<div class="row gtr-150">
+						<div class="col-6 col-12-medium">
+							<ul class="major-icons">
+
+				                <li><span class="icon"> <img src="../public/img/javascript.svg" 
+				style="width: 68%; transform: rotate(-45deg); padding-top: 26px;" alt=""></span></li>
+
+								<li><span class="icon"> <img src="../public/img/icons8-nodejs.svg" 
+                  style="width: 96.5%;transform: rotate(-45deg);"></span></li>
+				  
+
+				  <li><span class="icon"> <img src="../public/img/icons8-express-js.svg" 
+					style="width: 100%;transform: rotate(-45deg); padding-right: 18px;
+					margin: 13px;" alt=""></span></li>
+					
+					<li><span class="icon"> <img src="../public/img/icons8-mongodb.svg" 
+						style="width: 100%;transform: rotate(-45deg);padding-top: 8px; margin-left: 7px;" alt=""></span></li>
+						
+					
+						
+							
+							
+							
+						</ul>	
+						</div>
+            
+						<div class="col-6 col-12-medium">
+							<header class="major">
+								<h2>Використані інструменти для <br />
+									реалізації додатку</h2>
+							</header>
+							<p>JavaScript (JS) - це мова програмування, 
+								яка використовується для створення динамічних та інтерактивних веб-сторінок.</p>																
+							<p> Node.js - це середовище виконання JavaScript, яке дозволяє виконувати JavaScript-код 
+								на стороні сервера, що розширює можливості розробки веб-додатків.</p>
+							<p>Express.js - це легкий та гнучкий фреймворк для розробки веб-додатків на Node.js,
+							 який надає зручний шлях для створення маршрутів, 
+							 обробників запитів та роботи з HTTP-запитами та відповідями. </p>
+								<p>MongoDB - це нереляційна база даних, яка використовує схему документів 
+								JSON-подібного типу і надає гнучкість та швидкодію для 
+								зберігання та операцій з даними.</p>
+						</div>
+					</div>
+				</div>
+			</section>
+
+		
+		<!-- Footer -->
+			<section id="footer">
+				<ul class="icons">
+					<li><a href="https://twitter.com/komarovski2" class="icon brands alt fa-twitter" target="_blank" ><span  class="label">Twitter</span></a></li>
+          <li><a href="https://t.me/Titan_Odinochestva" class="icon brands alt fa-telegram" target="_blank"><span class="label">Telegram</span></a></li>
+					<li><a href="https://www.instagram.com/komarovski2" target="_blank" class="icon brands alt fa-instagram"><span class="label">Instagram</span></a></li>
+					<li><a href="https://github.com/Komarovski2" class="icon brands alt fa-github" target="_blank"><span  class="label">GitHub</span></a></li>
+          <li><a href="mailto:komarovski22@gmail.com" class="icon solid alt fa-envelope" target="_blank"><span class="label">Email</span></a></li>
+				</ul>
+				<ul class="copyright">
+					<li>&copy; Made by Komar Ivan</li>
+				</ul>
+			</section>
+
+		<!-- Scripts -->
+			<script src="../public/js/new_js/jquery.min.js"></script>
+			<script src="../public/js/new_js/jquery.scrolly.min.js"></script>
+			<script src="../public/js/new_js/browser.min.js"></script>
+			<script src="../public/js/new_js/breakpoints.min.js"></script>
+			<script src="../public/js/new_js/util.js"></script>
+			<script src="../public/js/new_js/main.js"></script>
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-GCFCN7G09K"></script>
+	</body>
+</html>
