@@ -78,6 +78,8 @@ function registrationLogic(app, database, request, result) {
   });
 }
 
+
+
 module.exports = {
   registrationLogic: registrationLogic,
 };
