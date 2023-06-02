@@ -4,9 +4,6 @@ var app = express();
 
 require('dotenv').config();
 
-const googleUser = process.env.GOOGLE_USER;
-const googleKey = process.env.GOOGLE_KEY;
-
 
 var formidable = require("express-formidable");
 app.use(formidable());
@@ -15,17 +12,7 @@ app.use(formidable());
 var bcrypt = require("bcrypt");
 var nodemailer = require('nodemailer')
 
-var nodemailerFrom = "filesharingapp22@gmail.com"
-var nodemailerobject ={
-    service:"gmail",
-    host: "smtp.gmail.com",
-    port:465,
-    secure:true,
-    auth : {
-        user: googleUser,
-        pass: googleKey
-    }
-}
+
 
 // use mongo DB as database
 var mongodb = require("mongodb");
@@ -656,8 +643,6 @@ http.listen(3000, function () {
         });
 
 
-
-
         app.post("/DeleteSharedFile", async function (request, result){
             const _id = request.fields._id;
 
@@ -961,12 +946,6 @@ http.listen(3000, function () {
             return false;
         });
 
-        app.get("/Admin", async function (request, result) {
-            // render an HTML page with number of pages, and posts data
-            result.render("Admin", {
-                request: request
-            });
-        });
 
         // search files or folders
         app.get("/Search", async function (request, result) {
@@ -1722,70 +1701,9 @@ http.listen(3000, function () {
 
 
         // register the user
-        app.post("/Register", async function (request, result) {
+    const registrationLogic = require('./public/js/controller/Register');
 
-            var name = request.fields.name;
-            var email = request.fields.email;
-            var password = request.fields.password;
-            var reset_token = "";
-            var isVerified = false;
-            var verification_token = new Date().getTime();
 
-            var user = await database.collection("users").findOne({
-                "email": email
-            });
-
-            if (user == null) {
-                bcrypt.hash(password, 10, async function (error, hash) {
-                    await database.collection("users").insertOne({
-                        "name": name,
-                        "email": email,
-                        "password": hash,
-                        "reset_token": reset_token,
-                        "uploaded": [],
-                        "sharedWithMe": [],
-                        "isVerified": isVerified,
-                        "verification_token": verification_token
-                    }, async function (error, data) {
-
-                        var transporter = nodemailer.createTransport(nodemailerobject);
-
-                        var text = "Please verify your account by click the following link: " + mainURL+ "/verifyEmail/"
-                        + email + "/" + verification_token;
-                        
-                        var html = "Please verify your account by click the following link: <br><br> <a href='"+
-                        mainURL + "/verifyEmail/" + email + "/"+ verification_token + "'> Confirm Email </a> <br><br> Thank you.";
-                        
-                        await transporter.sendMail({
-                            from:nodemailerFrom,
-                            to: email,
-                            subject:"Email Verification",
-                            text:text,
-                            html:html
-                        },function(error,info){
-                            if (error){
-                                console.error(error);
-                            } else {
-                                console.log("Email sent:"+info.response);
-                            }
-                            request.status = "success";
-                            request.message ="Signed up successfully. An email has been sent to verify your account.Once verified, you will be able to login and start using app";
-
-                            result.render("Register", {
-                                "request": request
-                            });
-                        });
-                    });
-                });
-            } else {
-                request.status = "error";
-                request.message = "Email already exist.";
-
-                result.render("Register", {
-                    "request": request
-                });
-            }  
-        });
  app.get("/verifyEmail/:email/:verification_token",async function(request,result){
     var email = request.params.email;
     var verification_token = request.params.verification_token;
@@ -1823,15 +1741,23 @@ http.listen(3000, function () {
     }
  });
 
-                        
 
         // show page to do the registration
-        app.get("/Register", function (request, result) {
+        // app.get("/Register", function (request, result) {
+        //     result.render("Register", {
+        //         "request": request
+        //     });
+        // });
+
+
+        app.get('/Register', function (request, result) {
+            registrationLogic(app, database, request, result); 
             result.render("Register", {
                 "request": request
-            });
-        });
+             });
+          });
 
+          
         // home page
         app.get("/", function (request, result) {
             result.render("index", {
