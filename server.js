@@ -4,29 +4,11 @@ var app = express();
 
 require('dotenv').config();
 
-
 var formidable = require("express-formidable");
 app.use(formidable());
 
 // to encrypt/decrypt passwords
 var bcrypt = require("bcrypt");
-var nodemailer = require('nodemailer')
-
-const googleUser = process.env.GOOGLE_USER;
-const googleKey = process.env.GOOGLE_KEY;
-
-var nodemailerFrom = googleUser;
-var nodemailerobject ={
-    service: "gmail",
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    auth: {
-        user: googleUser,
-        pass: googleKey
-    }
-};
-
 
 // use mongo DB as database
 var mongodb = require("mongodb");
@@ -86,6 +68,7 @@ app.use(function (request, result, next) {
     // continue the request
     next();
 });
+
 
 function removeSharedFileReturnUpdated (arr, _id){
     for (var a = 0; a < arr.length;a++){
@@ -267,65 +250,6 @@ function removeFileReturnUpdated(arr, _id) {
     return arr;
 }
 
-// recursive function to search uploaded files
-function recursiveSearch (files, query) {
-    var singleFile = null;
-
-    for (var a = 0; a < files.length; a++) {
-        const file = files[a];
-
-        if (file.type == "folder") {
-            // search folder case-insensitive
-            if (file.folderName.toLowerCase().search(query.toLowerCase()) > -1) {
-                return file;
-            }
-
-            if (file.files.length > 0) {
-                singleFile = recursiveSearch(file.files, query);
-                if (singleFile != null) {
-                    // need parent folder in case of files
-                    if (singleFile.type != "folder") {
-                        singleFile.parent = file;
-                    }
-                    return singleFile;
-                }
-            }
-        } else {
-            if (file.name.toLowerCase().search(query.toLowerCase()) > -1) {
-                return file;
-            }
-        }
-    }
-}
-
-// recursive function to search shared files
-function recursiveSearchShared (files, query) {
-    var singleFile = null;
-
-    for (var a = 0; a < files.length; a++) {
-        var file = (typeof files[a].file === "undefined") ? files[a] : files[a].file;
-
-        if (file.type == "folder") {
-            if (file.folderName.toLowerCase().search(query.toLowerCase()) > -1) {
-                return file;
-            }
-
-            if (file.files.length > 0) {
-                singleFile = recursiveSearchShared(file.files, query);
-                if (singleFile != null) {
-                    if (singleFile.type != "folder") {
-                        singleFile.parent = file;
-                    }
-                    return singleFile;
-                }
-            }
-        } else {
-            if (file.name.toLowerCase().search(query.toLowerCase()) > -1) {
-                return file;
-            }
-        }
-    }
-}
 
         function recursiveGetSharedFile (files, _id){
             var singleFile = null;
@@ -528,8 +452,10 @@ http.listen(3000, function () {
         database = client.db("file_transfer");
         console.log("Database connected.");
 
-        
+        const { searchLogic } = require("./public/js/controller/Search");
+        searchLogic(app, database);
 
+        
         app.post("/GetAllFolders", async function (request, result) {
             const _id = request.fields._id;
             const type = request.fields.type;
@@ -958,42 +884,6 @@ http.listen(3000, function () {
                 "message": "Please login to perform this action"
             });
             return false;
-        });
-
-
-        // search files or folders
-        app.get("/Search", async function (request, result) {
-            const search = request.query.search;
-
-            if (request.session.user) {
-                var user = await database.collection("users").findOne({
-                    "_id": ObjectId(request.session.user._id)
-                });
-                var fileUploaded = await recursiveSearch(user.uploaded, search);
-                var fileShared = await recursiveSearchShared(user.sharedWithMe, search);
-
-                // check if file is uploaded or shared with user
-                if (fileUploaded == null && fileShared == null) {
-                    request.status = "error";
-                    request.message = "File/folder '" + search + "' is neither uploaded nor shared with you.";
-
-                    result.render("Search", {
-                        "request": request
-                    });
-                    return false;
-                }
-
-                var file = (fileUploaded == null) ? fileShared : fileUploaded;
-                file.isShared = (fileUploaded == null);
-                result.render("Search", {
-                    "request": request,
-                    "file": file
-                });
-
-                return false;
-            }
-
-            result.redirect("/Login");
         });
 
 

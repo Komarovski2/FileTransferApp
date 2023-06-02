@@ -1,4 +1,6 @@
 // Search.js
+const { ObjectId } = require('mongodb');
+
 
 function recursiveSearch(files, query) {
     var singleFile = null;
