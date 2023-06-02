@@ -130,32 +130,6 @@ function removeSharedFolderReturnUpdated (arr, _id){
     }
 }
 
-function removeFolderReturnUpdated (arr, _id){
-    for (var a = 0; a < arr.length; a++) {
-        if (arr[a].type == "folder") {
-            if (arr[a]._id == _id) {
-                
-                try {
-                    fileSystem.rmdirSync(arr[a].folderPath, { recursive: true });
-                    console.log("Done");
-                } catch (err) {
-                    console.log(err);
-                }
-                
-                arr.splice(a, 1);
-                break;
-            }
-
-            if (arr[a].files.length > 0) {
-                arr[a]._id = ObjectId(arr[a]._id);
-                removeFolderReturnUpdated(arr[a].files, _id);
-            }
-        }
-    }
-    return arr;
-}
-
-
  function recursiveGetFile(files, _id){
     var singleFile = null;
 
@@ -272,43 +246,24 @@ function removeFileReturnUpdated(arr, _id) {
             }
         }
 
-        function updateMovedToFolderParent_ReturnUpdated(arr, _id, moveFolder){
-            for (var a = 0; a < arr.length; a++){
-                if (arr[a].type == "folder"){
-                    if (arr[a]._id == _id){
-
-                        moveFolder.folderPath = arr[a].folderPath + "/" +
-                        moveFolder.folderName;
-                        arr[a].files.push(moveFolder);
+        function removeFolderReturnUpdated(arr, _id) {
+            for (var a = 0; a < arr.length; a++) {
+                if (arr[a].type == "folder") {
+                    if (arr[a]._id == _id) {
+                        try {
+                            fileSystem.rmdirSync(arr[a].folderPath, { recursive: true });
+                            console.log("Done");
+                        } catch (err) {
+                            console.log(err);
+                        }
+        
+                        arr.splice(a, 1);
                         break;
                     }
-                    if( arr[a].files.length > 0){
+        
+                    if (arr[a].files.length > 0) {
                         arr[a]._id = ObjectId(arr[a]._id);
-                        updateMovedToFolderParent_ReturnUpdated(
-                            arr[a].files, _id, moveFolder);
-                    }
-                }
-            }
-            return arr;
-        }
-
-        function moveFolderReturnUpdated (arr, _id, moveFolder, moveToFolder){
-            for (var a = 0; a < arr.length; a++ ){
-                if (arr[a].type == "folder"){
-                    if (arr[a]._id == _id){
-
-                        const newPath = moveToFolder.folderPath + "/" + arr[a].folderName;
-                        fileSystem.rename(arr[a].folderPath, newPath, function (){
-                            console.log("Folder has been moved.")
-                        });
-
-                        arr.splice(a, 1)
-                        break;
-                    }
-
-                    if (arr[a].files.length > 0){
-                        arr[a]._id = ObjectId(arr[a]._id);
-                        moveFolderReturnUpdated(arr[a].files, _id, moveFolder, moveToFolder)
+                        removeFolderReturnUpdated(arr[a].files, _id);
                     }
                 }
             }
@@ -352,16 +307,23 @@ http.listen(3000, function () {
         database = client.db("file_transfer");
         console.log("Database connected.");
 
+        //Search file/folders
         const { searchLogic } = require("./public/js/controller/Search");
         searchLogic(app, database);
 
-
+        //Rename files and Folders/SubFolders
         const RenameObject = require("./public/js/controller/RenameObject"); 
         app.post("/RenameFile", async function (request, result) {
-            RenameObject.renameFile(database, request, result); // Передайте змінну database у функцію
+            RenameObject.renameFile(database, request, result); 
         });
         app.post("/RenameFolder", async function (request, result) {
-            RenameObject.renameFolder(database, request, result); // Передайте змінну database у функцію
+            RenameObject.renameFolder(database, request, result); 
+        });
+
+        //MoveObject - переміщення папок в інші папки
+        const MoveObject = require("./public/js/controller/MoveObject"); 
+        app.post('/MoveFile', async function(request, result) {
+            await MoveObject.moveFile(database, request, result);
         });
 
 
@@ -394,44 +356,6 @@ http.listen(3000, function () {
                 "status":"error",
                 "message":"Please login to perform this action."
             });
-        });
-
-        app.post("/MoveFile", async function (request, result) {
-            const _id = request.fields._id;
-            const type = request.fields.type;
-            const folder = request.fields.folder
-
-            if(request.session.user){
-
-                var user = await database.collection("users").findOne({
-                    "_id": ObjectId(request.session.user._id)
-                });
-
-                var updatedArray = user.uploaded;
-
-                if( type == "folder"){
-
-                    var moveFolder = await recursiveGetFolder(user.uploaded, _id)
-                    var moveToFolder = await recursiveGetFolder(user.uploaded, folder);
-
-                    updatedArray = await moveFolderReturnUpdated(user.uploaded,
-                        _id, moveFolder, moveToFolder);
-
-                    updatedArray = await updateMovedToFolderParent_ReturnUpdated(
-                            updatedArray, folder, moveFolder);
-                }
-                await database.collection("users").updateOne({
-                    "_id": ObjectId(request.session.user._id)
-                }, {
-                    $set: {
-                        "uploaded":updatedArray
-                    }
-                });
-                const backURL = request.header('Referer') || '/';
-                result.redirect(backURL);
-                return false;
-            }
-            result.redirect("/Login");
         });
 
         app.post("/DeleteSharedFile", async function (request, result){
@@ -548,7 +472,6 @@ http.listen(3000, function () {
                     }]
                 });
 
-                //remove from array
                 for (var a = 0; a < user.sharedWithMe.length; a++){
                     if (user.sharedWithMe[a]._id == _id){
                         user.sharedWithMe.splice(a, 1);
@@ -903,7 +826,6 @@ http.listen(3000, function () {
                 var file = (fileUploaded == null) ? fileShared: fileUploaded;
 
                 fileSystem.readFile(file.filePath, function (error, data) {
-                    // console.log(error);
 
                     result.json({
                         "status": "success",
@@ -1247,16 +1169,19 @@ http.listen(3000, function () {
         });
 
 
-       
+       //Логіка регєстрації
         const { registrationLogic} = require('./public/js/controller/Register');
 
+        //Логіка верифікації аккаунтів
         const verifyEmail = require("./public/js/controller/VerifyEmail");
             app.get("/verifyEmail/:email/:verification_token", (request, result) =>
             verifyEmail(app, database, request, result)
         );
 
+        //Логіка аутентифікації
         const LoginLogic = require('./public/js/controller/Login');
 
+        //ForgotPassword - логіка відновлення пароля
         const { forgotPasswordLogic } = require('./public/js/controller/ForgotPassword');
         forgotPasswordLogic(app, database);
 
@@ -1275,17 +1200,13 @@ http.listen(3000, function () {
             });
         });
 
-        
-        
-
         app.get('/Register', function (request, result) {
             registrationLogic(app, database, request, result); 
             result.render("Register", {
                 "request": request
              });
           });
-
-          
+   
         // home page
         app.get("/", function (request, result) {
             result.render("index", {
