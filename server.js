@@ -1492,16 +1492,6 @@ http.listen(3000, function () {
         });
 
 
-        
-        // authenticate the user
-        
-
-        app.get("/ForgotPassword", function (request, result) {
-            result.render("ForgotPassword", {
-                "request": request
-            });
-        });
-
         app.post("/SendRecoveryLink", async function (request,result){
             var email = request.fields.email;
             var user = await database.collection("users").findOne({
@@ -1646,55 +1636,23 @@ http.listen(3000, function () {
         });
 
 
-        // register the user
-const registrationLogic = require('./public/js/controller/Register');
-
-const LoginLogic = require('./public/js/controller/Login');
 
 
+        const { registrationLogic} = require('./public/js/controller/Register');
 
- app.get("/verifyEmail/:email/:verification_token",async function(request,result){
-    var email = request.params.email;
-    var verification_token = request.params.verification_token;
-    var user = await database.collection("users").findOne({
-        $and:[{
-            "email":email,
-        },{
-            "verification_token":parseInt(verification_token)
-        }]
+        const verifyEmail = require("./public/js/controller/VerifyEmail");
+            app.get("/verifyEmail/:email/:verification_token", (request, result) =>
+            verifyEmail(app, database, request, result)
+        );
+
+        const LoginLogic = require('./public/js/controller/Login');
+
+
+app.get("/ForgotPassword", function (request, result) {
+    result.render("ForgotPassword", {
+        "request": request
     });
-    if (user == null){
-        request.status = "error";
-        request.message = "Email does not exist.Or verification link is expired.";
-        result.render("Login",{
-            "request": request
-        });
-    } else {
-        await database.collection("users").findOneAndUpdate({
-            $and: [{
-                "email": email,
-            }, {
-                "verification_token":parseInt(verification_token)
-            }]
-        }, {
-            $set:{
-                "verification_token":"",
-                "isVerified":true
-            }
-        });
-        request.status = "success";
-        request.message = "Account has been verified. Please try login.";
-        result.render("Login",{
-            "request": request
-        });
-    }
- });
-
-//  app.get("/Login", function (request, result) {
-//     result.render("Login", {
-//         "request": request
-//     });
-// });
+});
 
         app.get("/Logout", function (request, result) {
             request.session.destroy();
