@@ -1491,64 +1491,10 @@ http.listen(3000, function () {
             result.redirect("/Login");
         });
 
-        // upload new file
-       
-        // logout the user
-        app.get("/Logout", function (request, result) {
-            request.session.destroy();
-            result.redirect("/");
-        });
 
-        // show page to login
-        app.get("/Login", function (request, result) {
-            result.render("Login", {
-                "request": request
-            });
-        });
-
+        
         // authenticate the user
-        app.post("/Login", async function (request, result) {
-            var email = request.fields.email;
-            var password = request.fields.password;
-
-            var user = await database.collection("users").findOne({
-                "email": email
-            });
-
-            if (user == null) {
-                request.status = "error";
-                request.message = "Email does not exist.";
-                result.render("Login", {
-                    "request": request
-                });
-                
-                return false;
-            }
-
-            bcrypt.compare(password, user.password, function (error, isVerify) {
-                if (isVerify) {
-                    if (user.isVerified){
-                    request.session.user = user;
-                    result.redirect("/");
-
-                    return false;
-                }
-                request.status = "error";
-                request.message = "Kindly verify your email.";
-                result.render("Login", {
-                    "request": request
-                });
-                return false;
-                
-                }
-
-                request.status = "error";
-                request.message = "Password is not correct.";
-                result.render("Login", {
-                    "request": request
-                });
-            });
-        });
+        
 
         app.get("/ForgotPassword", function (request, result) {
             result.render("ForgotPassword", {
@@ -1701,7 +1647,10 @@ http.listen(3000, function () {
 
 
         // register the user
-    const registrationLogic = require('./public/js/controller/Register');
+const registrationLogic = require('./public/js/controller/Register');
+
+const LoginLogic = require('./public/js/controller/Login');
+
 
 
  app.get("/verifyEmail/:email/:verification_token",async function(request,result){
@@ -1741,14 +1690,24 @@ http.listen(3000, function () {
     }
  });
 
+//  app.get("/Login", function (request, result) {
+//     result.render("Login", {
+//         "request": request
+//     });
+// });
 
-        // show page to do the registration
-        // app.get("/Register", function (request, result) {
-        //     result.render("Register", {
-        //         "request": request
-        //     });
-        // });
+        app.get("/Logout", function (request, result) {
+            request.session.destroy();
+            result.redirect("/");
+        });
 
+        // show page to login
+        app.get("/Login", function (request, result) {
+            LoginLogic(app, database, request, result)
+            result.render("Login", {
+                "request": request
+            });
+        });
 
         app.get('/Register', function (request, result) {
             registrationLogic(app, database, request, result); 
