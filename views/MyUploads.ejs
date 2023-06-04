@@ -79,6 +79,7 @@
                                     Share
                                 </button>
                             </li>
+                            
 
                             <li>
                                 <button type="button" class="btn btn-info btn-block" 
@@ -246,6 +247,8 @@
                     Share
                 </button>
 
+                
+
                 <form method="POST" action="<%= request.mainURL %>/DeleteFile"
                     id="form-delete-file">
                     
@@ -268,7 +271,7 @@
                 <div class="modal-header">
                     <h4 class="modal-title">Share with </h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">a</span>
+                        <span aria-hidden="true">X</span>
                     </button>
                 </div>
 
@@ -386,6 +389,7 @@
         </div>
 
     <script>
+
 
         function moveFolder(self) {
             const _id = self.getAttribute("data-id");

@@ -326,6 +326,51 @@ http.listen(3000, function () {
             await MoveObject.moveFile(database, request, result);
         });
 
+        const io = require("socket.io")(http)
+
+        io.on("connection", function(socket){
+            socket.on("sender-join", function(data){
+                socket.join(data.uid);
+            });
+            socket.on("receiver-join", function(data){
+                socket.join(data.uid);
+                socket.in(data.sender_uid).emit("init",data.uid);
+            });
+            socket.on("file-meta", function(data){
+                socket.in(data.uid).emit("fs-meta",data.metadata);
+            });
+            socket.on("fs-start", function(data){
+                socket.in(data.uid).emit("fs-share",{});
+            });
+            socket.on("file-raw", function(data){
+                socket.in(data.uid).emit("fs-share",data.buffer);
+            });
+        })
+
+
+        app.get("/index1", function (request, result) {
+            result.render("index1", {
+                "request": request
+            });
+        });
+
+        app.get("/receiver", function (request, result) {
+            result.render("receiver", {
+                "request": request
+            });
+        });
+
+
+
+
+
+
+
+
+
+
+
+
 
         app.post("/GetAllFolders", async function (request, result) {
             const _id = request.fields._id;
