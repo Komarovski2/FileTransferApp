@@ -199,32 +199,6 @@ function getUpdatedArray (arr, _id, uploadedObj) {
     return arr;
 }
 
-// recursive function to remove the file and return the updated array
-function removeFileReturnUpdated(arr, _id) {
-    for (var a = 0; a < arr.length; a++) {
-        if (arr[a].type != "folder" && arr[a]._id == _id) {
-            // remove the file from uploads folder
-            try {
-                fileSystem.unlinkSync(arr[a].filePath);
-            } catch (exp) {
-                // 
-            }
-            // remove the file from array
-            arr.splice(a, 1);
-            break;
-        }
-
-        // do the recursion if it has sub-folders
-        if (arr[a].type == "folder" && arr[a].files.length > 0) {
-            arr[a]._id = ObjectId(arr[a]._id);
-            removeFileReturnUpdated(arr[a].files, _id);
-        }
-    }
-
-    return arr;
-}
-
-
         function recursiveGetSharedFile (files, _id){
             var singleFile = null;
 
@@ -246,29 +220,6 @@ function removeFileReturnUpdated(arr, _id) {
             }
         }
 
-        function removeFolderReturnUpdated(arr, _id) {
-            for (var a = 0; a < arr.length; a++) {
-                if (arr[a].type == "folder") {
-                    if (arr[a]._id == _id) {
-                        try {
-                            fileSystem.rmdirSync(arr[a].folderPath, { recursive: true });
-                            console.log("Done");
-                        } catch (err) {
-                            console.log(err);
-                        }
-        
-                        arr.splice(a, 1);
-                        break;
-                    }
-        
-                    if (arr[a].files.length > 0) {
-                        arr[a]._id = ObjectId(arr[a]._id);
-                        removeFolderReturnUpdated(arr[a].files, _id);
-                    }
-                }
-            }
-            return arr;
-        }
 
         function recursiveGetAllFolders(files, _id){
             var folders = [];
@@ -313,18 +264,52 @@ http.listen(3000, function () {
 
         //Rename files and Folders/SubFolders
         const RenameObject = require("./public/js/controller/RenameObject"); 
+
         app.post("/RenameFile", async function (request, result) {
             RenameObject.renameFile(database, request, result); 
         });
+
         app.post("/RenameFolder", async function (request, result) {
             RenameObject.renameFolder(database, request, result); 
         });
 
         //MoveObject - переміщення папок в інші папки
         const MoveObject = require("./public/js/controller/MoveObject"); 
+
         app.post('/MoveFile', async function(request, result) {
             await MoveObject.moveFile(database, request, result);
         });
+
+        // DeleteObject - видалення файлів та папок
+        const DeleteObject = require("./public/js/controller/DeleteObject");
+
+        app.post("/DeleteFile", async function (request, result) {
+            await DeleteObject.deleteFile(database, request, result);
+        });
+
+        app.post("/DeleteDirectory", async function (request, result) {
+            await DeleteObject.deleteFolder(database, request, result);
+        });
+
+        const ShareViaLink = require("./public/js/controller/ShareViaLink");
+
+app.post("/ShareViaLink", async function (request, result) {
+    await ShareViaLink.shareViaLink(database, request, result);
+});
+
+app.get("/SharedViaLink/:hash", async function (request, result) {
+    await ShareViaLink.getSharedLink(database, request, result);
+});
+
+app.get("/MySharedLinks", async function (request, result) {
+    await ShareViaLink.getMySharedLinks(database, request, result);
+});
+
+app.post("/DeleteLink", async function (request, result) {
+    await ShareViaLink.deleteLink(database, request, result);
+});
+
+
 
         const io = require("socket.io")(http)
 
@@ -676,7 +661,6 @@ http.listen(3000, function () {
             const backURL = request.header("Referer") || "/";
             result.redirect(backURL)
         }
-        //Якщо це не убрати видає warning, пока не провірено чи не мішає result.redirect("/Login");
     });
 
         app.post("/GetUser", async function (request, result){
@@ -728,140 +712,6 @@ http.listen(3000, function () {
             });
         });
 
-        app.post("/DeleteLink", async function (request, result) {
-
-            const _id = request.fields._id;
-
-            if (request.session.user) {
-                var link = await database.collection("public_links").findOne({
-                    $and: [{
-                        "uploadedBy._id": ObjectId(request.session.user._id)
-                    }, {
-                        "_id": ObjectId(_id)
-                    }]
-                });
-
-                if (link == null) {
-                    request.session.status = "error";
-                    request.session.message = "Link does not exists.";
-
-                    const backURL = request.header("Referer") || "/";
-                    result.redirect(backURL);
-                    return false;
-                }
-
-                await database.collection("public_links").deleteOne({
-                    $and: [{
-                        "uploadedBy._id": ObjectId(request.session.user._id)
-                    }, {
-                        "_id": ObjectId(_id)
-                    }]
-                });
-
-                request.session.status = "success";
-                request.session.message = "Link has been deleted.";
-
-                const backURL = request.header("Referer") || "/";
-                result.redirect(backURL);
-                return false;
-            }
-
-            result.redirect("/Login");
-        });
-
-        app.get("/MySharedLinks", async function (request, result) {
-            if (request.session.user) {
-                var links = await database.collection("public_links").find({
-                    "uploadedBy._id": ObjectId(request.session.user._id)
-                }).toArray();
-
-                result.render("MySharedLinks", {
-                    "request": request,
-                    "links": links
-                });
-                return false;
-            }
-
-            result.redirect("/Login");
-        });
-
-        app.get("/SharedViaLink/:hash", async function (request, result) {
-            const hash = request.params.hash;
-
-            var link = await database.collection("public_links").findOne({
-                "hash": hash
-            });
-
-            if (link == null) {
-                request.session.status = "error";
-                request.session.message = "Link expired.";
-
-                result.render("SharedViaLink", {
-                    "request": request
-                });
-                return false;
-            }
-
-            result.render("SharedViaLink", {
-                "request": request,
-                "link": link
-            });
-        });
-
-        app.post("/ShareViaLink", async function (request, result) {
-            const _id = request.fields._id;
-
-            if (request.session.user) {
-                var user = await database.collection("users").findOne({
-                    "_id": ObjectId(request.session.user._id)
-                });
-
-                var file = await recursiveGetFile(user.uploaded, _id);
-                var folder = await recursiveGetFolder(user.uploaded, _id);
-
-                if (file == null && folder == null) {
-                    request.session.status = "error";
-                    request.session.message = "File does not exists";
-
-                    const backURL = request.header("Referer") || "/";
-                    result.redirect(backURL);
-                    return false;
-                }
-
-                if (folder != null){
-                    folder.name = folder.folderName;
-                    folder.filePath = folder.folderPath;
-                    delete folder.files;
-                    file = folder;
-                }
-
-                bcrypt.hash(file.name, 10, async function (error, hash) {
-                    hash = hash.substring(10, 20);
-                    const link = mainURL + "/SharedViaLink/" + hash;
-                    await database.collection("public_links").insertOne({
-                        "hash": hash,
-                        "file": file,
-                        "uploadedBy": {
-                            "_id": user._id,
-                            "name": user.name,
-                            "email": user.email
-                        },
-                        "createdAt": new Date().getTime()
-                    });
-
-                    request.session.status = "success";
-                    request.session.message = "Share link: " + link;
-
-                    const backURL = request.header("Referer") || "/";
-                    result.redirect(backURL);
-                });
-
-                return false;
-            }
-
-            result.redirect("/Login");
-        });
-      
         // download file
         app.post("/DownloadFile", async function (request, result) {
             const _id = request.fields._id;
@@ -905,65 +755,7 @@ http.listen(3000, function () {
             return false;
         });
 
-        app.post("/DeleteDirectory", async function (request, result) {
-
-            const _id = request.fields._id;
-
-            if(request.session.user){
-                var user = await database.collection("users").findOne({
-                    "_id": ObjectId(request.session.user._id)
-                });
-
-                var updatedArray = await removeFolderReturnUpdated(user.uploaded, _id)
-                for ( var a = 0; a < updatedArray.length; a++ ){
-                    updatedArray[a]._id = ObjectId(updatedArray[a]._id);
-                }
-
-                await database.collection("users").updateOne({
-                    "_id": ObjectId(request.session.user._id)
-                }, {
-                    $set: {
-                        "uploaded":updatedArray
-                    }
-                });
-
-                const backURL = request.header('Referer') || '/';
-                result.redirect("/MyUploads");
-                return false;
-            }
-            result.redirect("/Login");
-        });
-
-        app.post("/DeleteFile", async function (request, result) {
-            const _id = request.fields._id;
         
-            if (request.session.user) {
-                var user = await database.collection("users").findOne({
-                    "_id": ObjectId(request.session.user._id)
-                });
-
-                var updatedArray = await removeFileReturnUpdated(user.uploaded, _id);
-                for (var a = 0; a < updatedArray.length; a++) {
-                    updatedArray[a]._id = ObjectId(updatedArray[a]._id);
-                }
-
-                await database.collection("users").updateOne({
-                    "_id": ObjectId(request.session.user._id)
-                }, {
-                    $set: {
-                        "uploaded": updatedArray
-                    }
-                });
-
-                const backURL = request.header('Referer') || '/';
-                result.redirect(backURL);
-                return false;
-            }
-
-            result.redirect("/Login");
-        });
-        
-
         app.post("/UploadFile", async function (request, result) {
             if (request.session.user) {
 
