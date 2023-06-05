@@ -1,6 +1,5 @@
 const fileSystem = require('fs');
 const { ObjectId } = require('mongodb');
-const UploadFiles = require('./public/js/controller/UploadFiles');
 
 
 async function handleMyUploads(request, result, database) {
