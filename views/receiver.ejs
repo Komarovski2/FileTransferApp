@@ -12,29 +12,41 @@
     <div class="app">
         <div class="screen join-screen active">
             <div class="form">
-                <h2> Share your files securely </h2>
+                <h2> Share files fast </h2>
                 <div class="form-input">
+                    <div class="container-join">
                     <label for="join-id">Join ID</label>
                     <input type="text" id="join-id">
                 </div>
+                </div>
                 <div class="form-input">
-                    <button id="receiver-start-con-btn">Connect</button>
+                    <button class="new-button" id="receiver-start-con-btn">Connect</button>
                 </div>
             </div>
         </div>
         <div class="screen fs-screen">
             <div class="files-list">
                 <div class="title">Shared files:</div>
-
+             
             </div>
         </div>
     </div>
 
 
-    <script type="text/javascript" 
-    src="https://cdnjs.cloudflare.com/ajax/libs/downloadjs/1.4.1/download.min.js">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <script> 
+        $(document).ready(function() {
+            $(document).on("click", ".download-btn", function() {
+                var filename = $(this).closest(".item").find(".filename").text();
+                var downloadLink = document.createElement("a");
+                downloadLink.href = "/download/" + filename;
+                downloadLink.download = filename;
+                downloadLink.click();
+            });
+        });
     </script>
-  
+
     <script type="text/javascript" src="socket.io/socket.io.js"></script>
     <script type="text/javascript" src="../public/js/receiver.js"></script>
 </body>

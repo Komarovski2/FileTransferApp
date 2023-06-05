@@ -347,11 +347,26 @@ http.listen(3000, function () {
             });
         })
 
+        const path = require('path');
+
+        app.get('/download/:filename', (request, result) => {
+            const filename = request.params.filename;
+            const filePath = path.join(__dirname, 'public', 'uploads', 'komarovski22@gmail.com', filename); // Змініть шлях до відповідної папки з файлами
+            result.download(filePath, (err) => {
+              if (err) {
+                console.log(err);
+                result.status(404).send('Файл не знайдено');
+              }
+            });
+          });
 
         app.get("/index1", function (request, result) {
+            // if (request.session.user){
             result.render("index1", {
                 "request": request
             });
+        // }
+        // result.redirect("/Login");
         });
 
         app.get("/receiver", function (request, result) {

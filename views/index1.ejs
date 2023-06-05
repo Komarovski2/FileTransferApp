@@ -12,11 +12,14 @@
     <div class="app">
         <div class="screen join-screen active">
             <div class="form">
-                <h2> Share your files securely </h2>
+                <h2> Share files fast </h2>
                 <div class="form-input">
-                    <button id="sender-start-con-btn">Create room</button>
+                    <button class="button" id="sender-start-con-btn">Create room</button>
+                    <a class="button" href="http://localhost:3000/receiver">Invite in room</a>
+                    <a class="button" href="">Send Email</a>
                 </div>
-                <div class="form-input" id="join-id">
+                
+                <div class="form-input " id="join-id">
                 </div>
             </div>
         </div>
@@ -33,6 +36,54 @@
         </div>
     </div>
 
+    
+    
+<script> 
+function getFileIcon(filename) {
+       let extension = filename.split('.').pop();
+       let iconClass = '';
+     
+       switch(extension) {
+         case 'txt':
+           iconClass = 'fa-file-text-o';
+           break;
+         case 'pdf':
+           iconClass = 'fa-file-pdf-o';
+           break;
+         case 'doc':
+         case 'docx':
+           iconClass = 'fa-file-word-o';
+           break;
+         case 'xls':
+         case 'xlsx':
+           iconClass = 'fa-file-excel-o';
+           break;
+         case 'ppt':
+         case 'pptx':
+           iconClass = 'fa-file-powerpoint-o';
+           break;
+         case 'jpg':
+         case 'jpeg':
+         case 'png':
+           iconClass = 'fa-file-image-o';
+           break;
+         case 'MP4':
+         case 'AVI':
+         case 'MOV':
+           iconClass = 'fa-file-video-o';
+           break;
+         case 'zip':
+         case 'rar':
+         case '7z':
+           iconClass = 'fa-file-archive-o';
+           break;
+         default:
+           iconClass = 'fa-file-o';
+       }
+     
+       return `<i class="fa ${iconClass} file-icon"></i>`;
+     }
+     </script>
 
     <script type="text/javascript" src="socket.io/socket.io.js"></script>
     <script type="text/javascript" src="../public/js/code.js"></script>

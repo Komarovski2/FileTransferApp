@@ -8,6 +8,7 @@
     document.querySelector("#sender-start-con-btn").addEventListener("click",function(){
         let joinID = generateID();
         document.querySelector("#join-id").innerHTML= `
+        <div class="container-join">
         <b> Room ID </b>
         <span>${joinID}</span>
         `;
@@ -33,8 +34,11 @@
             let el = document.createElement("div");
             el.classList.add("item");
             el.innerHTML = `
+            <div class = "Icons-container">
+            <div class="IconsType"> ${getFileIcon(file.name)}</div>
             <div class="progress">0%</div>
-            <div class="filename">${file.name}</div>
+            </div>
+            <div class="filename"> ${file.name}</div>
             `;
             document.querySelector(".files-list").appendChild(el);
             shareFile({

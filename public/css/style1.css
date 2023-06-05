@@ -20,21 +20,35 @@ body{
     transform: translateX(-50%);
     width: 100%;
     height: 100%;
-    max-width: 500px;
+    max-width: 1200px;
     background: #fff;
-    border-right: 1px solid ;
-    border-left: 1px solid ;
+
 }
 
 .join-screen .form {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
+   display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
     padding: 50px;
 }
 
 .join-screen .form  .form-input{
-    margin: 10px 0px;
+    margin: 5px;
+    display: flex;
+    padding: 10px;
+}
+.new-button{
+   display: inline-block;
+    padding: 10px 20px;
+    background-color: #3d82eb;
+    color: white;
+    text-decoration: none;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 20px;
+    margin-right: 10px;
 }
 
 .join-screen .form h2 {
@@ -44,22 +58,40 @@ body{
     margin-bottom: 20px;
 }
 
-.join-screen .form button {
-    background: #111;
-    padding: 10px 20px;
-    font-size: 18px;
-    border-radius: 20px;
-    color: #fff;
-    border: none;
-    outline: none;
-    cursor: pointer;
+.button {
+   display: inline-block;
+   padding: 10px 20px;
+   background-color: #3d82eb;
+   color: white;
+   text-decoration: none;
+   border: none;
+   border-radius: 25px;
+   cursor: pointer;
+   font-size: 16px;
+   margin-right: 10px;
+ }
+
+ .button:hover {
+   background-color: #2980b9;
+ }
+
+ a:hover {
+   color: white;
+   text-decoration: none;
 }
+
 
 .join-screen .form #join-id b {
    color: #222;
    display: block;
-   margin-top: 20px;
+
 }
+
+.container-join {
+   display: flex;
+   align-items: center;
+ }
+ 
 
 .join-screen .form #join-id span {
     display: inline-block;
@@ -72,15 +104,17 @@ body{
  }
 
  .join-screen .form label {
-    color:#222;
-    font-size: 18px;
+   color: #222;
+   font-size: 25px;
+   font-weight: bolder;
+   margin-right: 15px;
  }
 
  .join-screen .form input {
     display: block;
     margin: 10px 0px;
     width: 100%;
-    max-width: 200px;
+    max-width: 250px;
     border: 1px solid #111;
     color: #111;
     font-size: 20px;
@@ -113,7 +147,6 @@ body{
  .fs-screen .files-list {
     margin-top: 20px;
     display: flex;
-    justify-content: space-between;
     gap: 20px;
     flex-wrap: wrap;
  }
@@ -126,25 +159,69 @@ body{
  }
 
  .fs-screen .files-list .item {
-    width: 33.33%;
+    width: 23%;
     min-width: 200px;
     border: 1px solid #eee;
     box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.05);
  }
 
  .fs-screen .files-list .item .progress {
-    padding: 30px;
-    text-align: center;
-    font-size: 50px;
-    font-family: monospace;
-    color: #222;
-    height: 70%;
+
+   text-align: center;
+   font-size: 35px;
+   font-family: monospace;
+   color: #222;
+   height: 70%;
+   background-color: white;
+   display: flex; /* Змінено значення на flex */
+   align-items: center; /* Змінено значення на center */
+
+ }
+ 
+ .Icons-container {
+   display: flex;
+   flex-direction: column; /* Змінено значення на column */
+   align-items: center;
+   font-size: 100px;
+   height: 175px;
+ }
+ 
+ .IconsType {
+   padding-top: 15px;
+   text-align: center;
+   font-size: 75px;
+   font-family: monospace;
+   color: #222;
+   height: 70%;
+   background-color: white;
+   display: flex; /* Змінено значення на flex */
+   align-items: center; /* Змінено значення на center */
+ }
+ 
+ .file-icon {
+   display: inline-block;
+   vertical-align: middle;
+   margin-right: 5px;
+ }
+ 
+ .fs-screen .files-list .item .filename {
+   font-size: 1.4rem;
+   color: #007bff;
+   font-weight: 500;
+   background-color: rgba(0,0,0,.03);
+   border-top: 1px solid rgba(0,0,0,.125);
+   padding: 0.5rem 0.75rem;
  }
 
- .fs-screen .files-list .item .filename {
-    font-size: 16px;
-    padding: 5px;
-    border-top: 1px solid #eee;
+ .container-join {
+   display: flex;
+   align-items: center;
  }
+ 
+ .container-join b {
+   margin-right: 15px;
+   font-size: 25px ;
+ }
+ 
 
 
