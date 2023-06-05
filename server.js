@@ -267,7 +267,6 @@ http.listen(3000, function () {
             await ShareViaLink.deleteLink(database, request, result);
         });
 
-
         // DownloadFile - скачування файлів
         const DownloadFile = require("./public/js/controller/DownloadFile");
 
@@ -275,20 +274,28 @@ http.listen(3000, function () {
              await DownloadFile.downloadFile(database, request, result);
         });
 
+        // DisplayListOfAllUsers - Показ кому зашерив і видалення тому кому зашерив
         const ShareFilesViaEmail = require('./public/js/controller/ShareFilesViaEmail');
-
 
         app.post("/GetUser", async function (request, result) {
             await ShareFilesViaEmail.GetUser(database, request, result);
        });
 
        app.post("/Share", async function (request, result) {
-        await ShareFilesViaEmail.Share(database, request, result);
-   });
+            await ShareFilesViaEmail.Share(database, request, result);
+        });
 
+        // DisplayListOfAllUsers - Показ кому зашерив і видалення тому кому зашерив
+        const DisplayListOfAllUsers = require('./public/js/controller/DisplayListOfAllUsers');
 
+        app.post("/GetFileSharedWith", async function (request, result) {
+            await DisplayListOfAllUsers.GetFileSharedWith(database, request, result);
+        });
 
-
+        app.post("/RemoveSharedAccess", async function (request, result) {
+            await DisplayListOfAllUsers.RemoveSharedAccess(database, request, result);
+        });
+        
         
 
 
@@ -399,7 +406,7 @@ http.listen(3000, function () {
 
         app.get("/SharedWithMe/:_id?", async function (request, result){
             const _id = request.params._id;
-
+            
             if(request.session.user){
                 var user = await database.collection("users").findOne({
                     "_id": ObjectId(request.session.user._id)
@@ -410,7 +417,6 @@ http.listen(3000, function () {
                 if (typeof _id == "undefined"){
                     files = user.sharedWithMe;
                 } else {
-
                     var folderObj = await recursiveGetSharedFolder(user.sharedWithMe, _id)
 
                     if (folderObj == null){
@@ -443,91 +449,6 @@ http.listen(3000, function () {
         result.redirect("/Login")
      });
 
-
-        //remove shared access
-        app.post("/RemoveSharedAccess", async function (request, result){
-            const _id = request.fields._id;
-
-            if (request.session.user) {
-                const user = await database.collection("users").findOne({
-                    $and: [{
-                        "sharedWithMe._id": ObjectId(_id)
-                    }, {
-                        "sharedWithMe.sharedBy._id":ObjectId(request.session.user._id)
-                    }]
-                });
-
-                for (var a = 0; a < user.sharedWithMe.length; a++){
-                    if (user.sharedWithMe[a]._id == _id){
-                        user.sharedWithMe.splice(a, 1);
-                    }
-                }
-                await database.collection("users").findOneAndUpdate({
-                    $and: [{
-                        "sharedWithMe._id": ObjectId(_id)
-                    }, {
-                        "sharedWithMe.sharedBy._id":ObjectId(request.session.user._id)
-                    }]
-                }, {
-                    $set:{
-                        "sharedWithMe":user.sharedWithMe
-                    }
-                });
-
-                request.session.status = "success";
-                request.session.message = "Shared access has been removed.";
-
-                const backURL = request.header('Referer') || '/';
-                result.redirect(backURL);
-                return false;
-            }
-            result.redirect("/Login")
-        });
-
-        app.post ("/GetFileSharedWith", async function (request, result){
-            const _id = request.fields._id;
-
-            if(request.session.user){
-                const tempUsers = await database.collection("users").find({
-                    $and: [{
-                        "sharedWithMe.file._id":ObjectId(_id)
-                    }, {
-                        "sharedWithMe.sharedBy._id": ObjectId(request.session.user._id)
-                    }]
-                }).toArray();
-
-                var users = [];
-                for (var a = 0; a < tempUsers.length; a++){
-                    var sharedObj = null;
-                    for (var b = 0; b < tempUsers[a].sharedWithMe.length; b++){
-                        if(tempUsers[a].sharedWithMe[b].file._id == _id){
-                            sharedObj = {
-                                "_id":tempUsers[a].sharedWithMe[b]._id,
-                                "sharedAt":tempUsers[a].sharedWithMe[b].createdAt,
-                            };
-                        }
-                    }
-
-                    users.push({
-                        "_id":tempUsers[a]._id,
-                        "name":tempUsers[a].name,
-                        "email":tempUsers[a].email,
-                        "sharedObj":sharedObj
-                    });
-                }
-                result.json({
-                    "status":"success",
-                    "message":"Record has been fetched.",
-                    "users":users
-                });
-                return false;
-            }
-
-            result.json({
-                "status":"error",
-                "message":"Please login to perform this action."
-        });
-    });
 
         // get all files shared with logged-in user
         app.get("/SharedWithMe/:_id?", async function (request, result) {
@@ -740,7 +661,6 @@ http.listen(3000, function () {
                     uploaded = user.uploaded;
                 } else {
                     var folderObj = await recursiveGetFolder(user.uploaded, _id);
-
                     if (folderObj == null){
                         request.status = "error";
                         request.message = "Folder not found.";

@@ -1,7 +1,5 @@
 const { ObjectId } = require('mongodb');
 
-
-
 async function GetUser(database, request, result) {
     const email = request.fields.email;
 
