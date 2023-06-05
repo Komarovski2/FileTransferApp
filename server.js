@@ -199,52 +199,6 @@ function getUpdatedArray (arr, _id, uploadedObj) {
     return arr;
 }
 
-        function recursiveGetSharedFile (files, _id){
-            var singleFile = null;
-
-            for (var a = 0; a <files.length; a++){
-                var file = (typeof files[a].file === "undefined") ? files[a]:files[a].file;
-
-                if (file.type != "folder") {
-                    if (file._id == _id){
-                        return file;
-                    }
-                }
-                if (file.type == "folder" && file.files.length > 0){
-                    singleFile = recursiveGetSharedFile(file.files,_id)
-
-                    if(singleFile != null){
-                        return singleFile;
-                    }
-                }
-            }
-        }
-
-
-        function recursiveGetAllFolders(files, _id){
-            var folders = [];
-            
-            for (var a = 0; a < files.length; a++){
-                const file = files[a];
-
-                if(file.type == "folder"){
-
-                    if (file._id != _id){
-                        folders.push(file);
-                        if(file.files.length > 0){
-                            var tempFolders = recursiveGetAllFolders(file.files, _id);
-
-                            for (var b = 0; b < tempFolders.length; b++){
-                                folders.push(tempFolders[b]);
-                            }
-                        }
-                    }
-                }
-            }
-            return folders;
-        }
-
-
 // start the http server
 http.listen(3000, function () {
     console.log("Server started at " + mainURL);
@@ -274,11 +228,17 @@ http.listen(3000, function () {
         });
 
         //MoveObject - переміщення папок в інші папки
-        const MoveObject = require("./public/js/controller/MoveObject"); 
+        const { moveFile, getAllFolders } = require("./public/js/controller/MoveObject");
 
-        app.post('/MoveFile', async function(request, result) {
-            await MoveObject.moveFile(database, request, result);
+        app.post("/MoveFile", async function (request, result) {
+            await moveFile(database, request, result);
         });
+        
+        app.post("/GetAllFolders", async function (request, result) {
+            await getAllFolders(database, request, result);
+        });
+        
+
 
         // DeleteObject - видалення файлів та папок
         const DeleteObject = require("./public/js/controller/DeleteObject");
@@ -293,21 +253,33 @@ http.listen(3000, function () {
 
         const ShareViaLink = require("./public/js/controller/ShareViaLink");
 
-app.post("/ShareViaLink", async function (request, result) {
-    await ShareViaLink.shareViaLink(database, request, result);
-});
+        app.post("/ShareViaLink", async function (request, result) {
+            await ShareViaLink.shareViaLink(database, request, result);
+        });
 
-app.get("/SharedViaLink/:hash", async function (request, result) {
-    await ShareViaLink.getSharedLink(database, request, result);
-});
+        app.get("/SharedViaLink/:hash", async function (request, result) {
+            await ShareViaLink.getSharedLink(database, request, result);
+        });
 
-app.get("/MySharedLinks", async function (request, result) {
-    await ShareViaLink.getMySharedLinks(database, request, result);
-});
+        app.get("/MySharedLinks", async function (request, result) {
+            await ShareViaLink.getMySharedLinks(database, request, result);
+        });
 
-app.post("/DeleteLink", async function (request, result) {
-    await ShareViaLink.deleteLink(database, request, result);
-});
+        app.post("/DeleteLink", async function (request, result) {
+            await ShareViaLink.deleteLink(database, request, result);
+        });
+
+
+        // DownloadFile - скачування файлів
+        const DownloadFile = require("./public/js/controller/DownloadFile");
+
+        app.post("/DownloadFile", async function (request, result) {
+             await DownloadFile.downloadFile(database, request, result);
+        });
+
+
+        
+
 
 
 
@@ -357,49 +329,6 @@ app.post("/DeleteLink", async function (request, result) {
         app.get("/receiver", function (request, result) {
             result.render("receiver", {
                 "request": request
-            });
-        });
-
-
-
-
-
-
-
-
-
-
-
-
-
-        app.post("/GetAllFolders", async function (request, result) {
-            const _id = request.fields._id;
-            const type = request.fields.type;
-
-            if(request.session.user){
-                var user = await database.collection("users").findOne({
-                    "_id": ObjectId(request.session.user._id)
-                });
-
-                var tempAllFolders = recursiveGetAllFolders(user.uploaded, _id);
-                var folders = [];
-                for (var a = 0; a < tempAllFolders.length; a++){
-                    folders.push({
-                        "_id": tempAllFolders[a]._id,
-                        "folderName":tempAllFolders[a].folderName
-                    });
-                }
-                result.json({
-                    "status": "success",
-                    "message":"Record has been fetched.",
-                    "folders":folders
-                });
-                return false;
-            }
-
-            result.json({
-                "status":"error",
-                "message":"Please login to perform this action."
             });
         });
 
@@ -712,50 +641,7 @@ app.post("/DeleteLink", async function (request, result) {
             });
         });
 
-        // download file
-        app.post("/DownloadFile", async function (request, result) {
-            const _id = request.fields._id;
-
-            if (request.session.user) {
-
-                var user = await database.collection("users").findOne({
-                    "_id": ObjectId(request.session.user._id)
-                });
-
-                var fileUploaded = await recursiveGetFile(user.uploaded, _id);
-                var fileShared = await recursiveGetSharedFile(user.sharedWithMe,_id)
-                
-                if (fileUploaded == null && fileShared == null) {
-                    result.json({
-                        "status": "error",
-                        "message": "File is neither uploaded nor shared with you."
-                    });
-                    return false;
-                }
-
-                var file = (fileUploaded == null) ? fileShared: fileUploaded;
-
-                fileSystem.readFile(file.filePath, function (error, data) {
-
-                    result.json({
-                        "status": "success",
-                        "message": "Data has been fetched.",
-                        "arrayBuffer": data,
-                        "fileType": file.type,
-                        "fileName": file.name
-                    });
-                });
-                return false;
-            }
-
-            result.json({
-                "status": "error",
-                "message": "Please login to perform this action."
-            });
-            return false;
-        });
-
-        
+         
         app.post("/UploadFile", async function (request, result) {
             if (request.session.user) {
 
