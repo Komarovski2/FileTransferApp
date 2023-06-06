@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt');
-const { sendEmail } = require('../../../nodemailer');
+const { sendEmail } = require('./nodemailer');
 
 var mainURL = "http://localhost:3000";
 

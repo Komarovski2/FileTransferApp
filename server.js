@@ -7,24 +7,13 @@ require('dotenv').config();
 var formidable = require("express-formidable");
 app.use(formidable());
 
-// to encrypt/decrypt passwords
-var bcrypt = require("bcrypt");
-
 // use mongo DB as database
 var mongodb = require("mongodb");
 var mongoClient = mongodb.MongoClient;
 
-// the unique ID for each mongo DB document
-var ObjectId = mongodb.ObjectId;
-
 // receiving http requests
 var httpObj = require("http");
 var http = httpObj.createServer(app);
-
-// to store files
-var fileSystem = require("fs");
-
-const rimraf = require('rimraf');
 
 // to start the session
 var session = require("express-session");
@@ -83,11 +72,11 @@ http.listen(3000, function () {
         console.log("Database connected.");
 
         //Search file/folders
-        const { searchLogic } = require("./public/js/controller/Search");
+        const { searchLogic } = require("./controller/Search");
         searchLogic(app, database);
 
         //Rename files and Folders/SubFolders
-        const RenameObject = require("./public/js/controller/RenameObject"); 
+        const RenameObject = require("./controller/RenameObject"); 
 
         app.post("/RenameFile", async function (request, result) {
             RenameObject.renameFile(database, request, result); 
@@ -98,7 +87,7 @@ http.listen(3000, function () {
         });
 
         //MoveObject - переміщення папок в інші папки
-        const { moveFile, getAllFolders } = require("./public/js/controller/MoveObject");
+        const { moveFile, getAllFolders } = require("./controller/MoveObject");
 
         app.post("/MoveFile", async function (request, result) {
             await moveFile(database, request, result);
@@ -109,7 +98,7 @@ http.listen(3000, function () {
         });
         
         // DeleteObject - видалення файлів та папок
-        const DeleteObject = require("./public/js/controller/DeleteObject");
+        const DeleteObject = require("./controller/DeleteObject");
 
         app.post("/DeleteFile", async function (request, result) {
             await DeleteObject.deleteFile(database, request, result);
@@ -120,7 +109,7 @@ http.listen(3000, function () {
         });
 
         // ShareViaLink - створення публічних ссилок і їх видалення.
-        const ShareViaLink = require("./public/js/controller/ShareViaLink");
+        const ShareViaLink = require("./controller/ShareViaLink");
 
         app.post("/ShareViaLink", async function (request, result) {
             await ShareViaLink.shareViaLink(database, request, result);
@@ -139,14 +128,14 @@ http.listen(3000, function () {
         });
 
         // DownloadFile - скачування файлів
-        const DownloadFile = require("./public/js/controller/DownloadFile");
+        const DownloadFile = require("./controller/DownloadFile");
 
         app.post("/DownloadFile", async function (request, result) {
              await DownloadFile.downloadFile(database, request, result);
         });
 
         // DisplayListOfAllUsers - Показ кому зашерив і видалення тому кому зашерив
-        const ShareFilesViaEmail = require('./public/js/controller/ShareFilesViaEmail');
+        const ShareFilesViaEmail = require('./controller/ShareFilesViaEmail');
 
         app.post("/GetUser", async function (request, result) {
             await ShareFilesViaEmail.GetUser(database, request, result);
@@ -157,7 +146,7 @@ http.listen(3000, function () {
         });
 
         // DisplayListOfAllUsers - Показ кому зашерив і видалення тому кому зашерив
-        const DisplayListOfAllUsers = require('./public/js/controller/DisplayListOfAllUsers');
+        const DisplayListOfAllUsers = require('./controller/DisplayListOfAllUsers');
 
         app.post("/GetFileSharedWith", async function (request, result) {
             await DisplayListOfAllUsers.GetFileSharedWith(database, request, result);
@@ -168,7 +157,7 @@ http.listen(3000, function () {
         });
         
         // SharedWithMeAndDelete - показ файлів SharedWithMe/:_id та видалення папок/файлів
-        const SharedWithMeAndDelete = require('./public/js/controller/SharedWithMeAndDelete');
+        const SharedWithMeAndDelete = require('./controller/SharedWithMeAndDelete');
 
         app.get("/SharedWithMe/:_id?", async function (request, result) {
             await SharedWithMeAndDelete.SharedWithMe(database, request, result);
@@ -184,14 +173,14 @@ http.listen(3000, function () {
         
         // CreatedFolder - створення папок
 
-        const CreatedFolder = require('./public/js/controller/CreatedFolder');
+        const CreatedFolder = require('./controller/CreatedFolder');
 
         app.post("/CreateFolder", async function (request, result) {
             await CreatedFolder.CreateFolder(database, request, result);
         });
 
         // CreatedFolder - загрузка файлів та їх відображення
-        const UploadFiles = require('./public/js/controller/UploadFiles');
+        const UploadFiles = require('./controller/UploadFiles');
 
         app.post("/UploadFile", async function (request, result) {
             UploadFiles.handleUploadFile(request, result, database);
@@ -263,19 +252,19 @@ http.listen(3000, function () {
         });
 
        //Логіка регєстрації
-        const { registrationLogic} = require('./public/js/controller/Register');
+        const { registrationLogic} = require('./controller/Register');
 
         //Логіка верифікації аккаунтів
-        const verifyEmail = require("./public/js/controller/VerifyEmail");
+        const verifyEmail = require("./controller/VerifyEmail");
             app.get("/verifyEmail/:email/:verification_token", (request, result) =>
             verifyEmail(app, database, request, result)
         );
 
         //Логіка аутентифікації
-        const LoginLogic = require('./public/js/controller/Login');
+        const LoginLogic = require('./controller/Login');
 
         //ForgotPassword - логіка відновлення пароля
-        const { forgotPasswordLogic } = require('./public/js/controller/ForgotPassword');
+        const { forgotPasswordLogic } = require('./controller/ForgotPassword');
         forgotPasswordLogic(app, database);
 
         app.get("/Logout", function (request, result) {
