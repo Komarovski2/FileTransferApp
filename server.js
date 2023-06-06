@@ -76,7 +76,7 @@ http.listen(3000, function () {
         searchLogic(app, database);
 
         //Rename files and Folders/SubFolders
-        const RenameObject = require("./controller/RenameObject"); 
+        const RenameObject = require("./controller/InteractionObject/RenameObject"); 
 
         app.post("/RenameFile", async function (request, result) {
             RenameObject.renameFile(database, request, result); 
@@ -87,7 +87,7 @@ http.listen(3000, function () {
         });
 
         //MoveObject - переміщення папок в інші папки
-        const { moveFile, getAllFolders } = require("./controller/MoveObject");
+        const { moveFile, getAllFolders } = require("./controller/InteractionObject/MoveObject");
 
         app.post("/MoveFile", async function (request, result) {
             await moveFile(database, request, result);
@@ -98,7 +98,7 @@ http.listen(3000, function () {
         });
         
         // DeleteObject - видалення файлів та папок
-        const DeleteObject = require("./controller/DeleteObject");
+        const DeleteObject = require("./controller/InteractionObject/DeleteObject");
 
         app.post("/DeleteFile", async function (request, result) {
             await DeleteObject.deleteFile(database, request, result);
@@ -109,7 +109,7 @@ http.listen(3000, function () {
         });
 
         // ShareViaLink - створення публічних ссилок і їх видалення.
-        const ShareViaLink = require("./controller/ShareViaLink");
+        const ShareViaLink = require("./controller/ShareFiles/ShareViaLink");
 
         app.post("/ShareViaLink", async function (request, result) {
             await ShareViaLink.shareViaLink(database, request, result);
@@ -128,14 +128,14 @@ http.listen(3000, function () {
         });
 
         // DownloadFile - скачування файлів
-        const DownloadFile = require("./controller/DownloadFile");
+        const DownloadFile = require("./controller/InteractionObject/DownloadFile");
 
         app.post("/DownloadFile", async function (request, result) {
              await DownloadFile.downloadFile(database, request, result);
         });
 
         // DisplayListOfAllUsers - Показ кому зашерив і видалення тому кому зашерив
-        const ShareFilesViaEmail = require('./controller/ShareFilesViaEmail');
+        const ShareFilesViaEmail = require('./controller/ShareFiles/ShareFilesViaEmail');
 
         app.post("/GetUser", async function (request, result) {
             await ShareFilesViaEmail.GetUser(database, request, result);
@@ -146,7 +146,7 @@ http.listen(3000, function () {
         });
 
         // DisplayListOfAllUsers - Показ кому зашерив і видалення тому кому зашерив
-        const DisplayListOfAllUsers = require('./controller/DisplayListOfAllUsers');
+        const DisplayListOfAllUsers = require('./controller/ShareFiles/DisplayListOfAllUsers');
 
         app.post("/GetFileSharedWith", async function (request, result) {
             await DisplayListOfAllUsers.GetFileSharedWith(database, request, result);
@@ -157,7 +157,7 @@ http.listen(3000, function () {
         });
         
         // SharedWithMeAndDelete - показ файлів SharedWithMe/:_id та видалення папок/файлів
-        const SharedWithMeAndDelete = require('./controller/SharedWithMeAndDelete');
+        const SharedWithMeAndDelete = require('./controller/ShareFiles/SharedWithMeAndDelete');
 
         app.get("/SharedWithMe/:_id?", async function (request, result) {
             await SharedWithMeAndDelete.SharedWithMe(database, request, result);
@@ -173,14 +173,14 @@ http.listen(3000, function () {
         
         // CreatedFolder - створення папок
 
-        const CreatedFolder = require('./controller/CreatedFolder');
+        const CreatedFolder = require('./controller/CreatedObject/CreatedFolder');
 
         app.post("/CreateFolder", async function (request, result) {
             await CreatedFolder.CreateFolder(database, request, result);
         });
 
         // CreatedFolder - загрузка файлів та їх відображення
-        const UploadFiles = require('./controller/UploadFiles');
+        const UploadFiles = require('./controller/CreatedObject/UploadFiles');
 
         app.post("/UploadFile", async function (request, result) {
             UploadFiles.handleUploadFile(request, result, database);
@@ -252,19 +252,19 @@ http.listen(3000, function () {
         });
 
        //Логіка регєстрації
-        const { registrationLogic} = require('./controller/Register');
+        const { registrationLogic} = require('./controller/authentication/Register');
 
         //Логіка верифікації аккаунтів
-        const verifyEmail = require("./controller/VerifyEmail");
+        const verifyEmail = require("./controller/authentication/VerifyEmail");
             app.get("/verifyEmail/:email/:verification_token", (request, result) =>
             verifyEmail(app, database, request, result)
         );
 
         //Логіка аутентифікації
-        const LoginLogic = require('./controller/Login');
+        const LoginLogic = require('./controller/authentication/Login');
 
         //ForgotPassword - логіка відновлення пароля
-        const { forgotPasswordLogic } = require('./controller/ForgotPassword');
+        const { forgotPasswordLogic } = require('./controller/authentication/ForgotPassword');
         forgotPasswordLogic(app, database);
 
         app.get("/Logout", function (request, result) {

@@ -3,12 +3,12 @@ const express = require('express');
 const router = express.Router();
 
 const { searchLogic } = require("./public/js/controller/Search");
-const RenameObject = require("./public/js/controller/RenameObject");
+const RenameObject = require("./public/js/controller/InteractionObject/RenameObject");
 const { moveFile, getAllFolders } = require("./public/js/controller/MoveObject");
 const DeleteObject = require("./public/js/controller/DeleteObject");
 const ShareViaLink = require("./public/js/controller/ShareViaLink");
 const DownloadFile = require("./public/js/controller/DownloadFile");
-const ShareFilesViaEmail = require('./public/js/controller/ShareFilesViaEmail');
+const ShareFilesViaEmail = require('./public/js/controller/ShareFiles/ShareFilesViaEmail');
 const DisplayListOfAllUsers = require('./public/js/controller/DisplayListOfAllUsers');
 const SharedWithMeAndDelete = require('./public/js/controller/SharedWithMeAndDelete');
 const CreatedFolder = require('./public/js/controller/CreatedFolder');
